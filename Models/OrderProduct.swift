@@ -1,6 +1,6 @@
 //
-//  File 2.swift
-//  
+//  OrderProduct.swift
+//  SimPOS
 //
 //  Created by Dong on 2024/1/31.
 //
