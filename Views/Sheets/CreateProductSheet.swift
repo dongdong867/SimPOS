@@ -19,39 +19,8 @@ struct CreateProductSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                HStack {
-                    Text("Name")
-                    TextField("Name", text: $name)
-                }
-                HStack {
-                    Text("Price")
-                    TextField("Price", value: $price, format: .number)
-                }
-                HStack {
-                    Text("Cost")
-                    TextField("Price", value: $price, format: .number)
-                }
-                HStack {
-                    Text("Storage")
-                    TextField("Price", value: $price, format: .number)
-                }
-                VStack(alignment: .leading) {
-                    PhotosPicker("Select a photo", selection: $selectedImage)
-                        .onChange(of: selectedImage) { _, image in
-                            Task {
-                                if let data = try? await image?.loadTransferable(type: Data.self) {
-                                    selectedImageData = data
-                                }
-                            }
-                        }
-                    if let selectedImageData,
-                       let image = UIImage(data: selectedImageData) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                    }
-                }
+                productInfo
+                imageSelector
             }
             .multilineTextAlignment(.trailing)
             .navigationTitle("Create product")
@@ -63,6 +32,46 @@ struct CreateProductSheet: View {
                     }
                 }
             })
+        }
+    }
+    
+    @ViewBuilder
+    var productInfo: some View {
+        HStack {
+            Text("Name")
+            TextField("Name", text: $name)
+        }
+        HStack {
+            Text("Price")
+            TextField("Price", value: $price, format: .number)
+        }
+        HStack {
+            Text("Cost")
+            TextField("Price", value: $price, format: .number)
+        }
+        HStack {
+            Text("Storage")
+            TextField("Price", value: $price, format: .number)
+        }
+    }
+    
+    var imageSelector: some View {
+        VStack(alignment: .leading) {
+            PhotosPicker("Select a photo", selection: $selectedImage)
+                .onChange(of: selectedImage) { _, image in
+                    Task {
+                        if let data = try? await image?.loadTransferable(type: Data.self) {
+                            selectedImageData = data
+                        }
+                    }
+                }
+            if let selectedImageData,
+               let image = UIImage(data: selectedImageData) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
         }
     }
 }
