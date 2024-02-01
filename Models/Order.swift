@@ -13,7 +13,7 @@ final class Order {
     @Attribute(.unique)
     let id: String
 
-    @Relationship(inverse: \OrderProduct.order)
+    @Relationship(deleteRule: .cascade, inverse: \OrderProduct.order)
     var orderProducts: [OrderProduct] = []
     
     let createTime: Date

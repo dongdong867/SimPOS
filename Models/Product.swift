@@ -16,19 +16,21 @@ class Product {
     @Attribute(.externalStorage)
     var imageData: Data?
     
-    @Relationship(inverse: \OrderProduct.product)
+    @Relationship(deleteRule: .cascade, inverse: \OrderProduct.product)
     var orderProducts: [OrderProduct] = []
     
     var name: String
     var price: Float
-    var storage: Int
+    var cost: Float?
+    var storage: Int?
     
     
-    init(imageData: Data? , name: String, price: Float, storage: Int) {
+    init(imageData: Data? , name: String, price: Float, cost: Float?, storage: Int?) {
         self.id = UUID().uuidString
         self.imageData = imageData
         self.name = name
         self.price = price
+        self.cost = cost
         self.storage = storage
     }
 }
