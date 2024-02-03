@@ -37,7 +37,7 @@ struct CreateProductSheet: View {
                     } label: {
                         Text("Save")
                     }
-                    .disabled(name.isEmpty || price == nil)
+                    .disabled(name.isEmpty || price == nil || validation.hasNameError || validation.hasPriceError)
                 }
             })
         }
