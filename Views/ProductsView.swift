@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct ProductsView: View {
+    
     @State var search: String = ""
     @State var isShowingSheet = false
     
@@ -29,10 +30,19 @@ struct ProductsView: View {
             ScrollView {
                 LazyVGrid(columns: [GridItem(), GridItem()]) {
                     ForEach(products) { product in
-                        ProductCard(product: product)
+                        NavigationLink {
+                            Text(product.name)
+                        } label: {
+                            VStack {
+                                ProductImage(data: product.imageData)
+                                Text(product.name)
+                            }
+                            .tint(.primary)
+                        }
                     }
                 }
                 .navigationTitle("Products")
+                .padding()
                 .toolbar(content: {
                     ToolbarItemGroup {
                         Button {
