@@ -12,37 +12,11 @@ struct ProductsView: View {
     
     @State var search: String = ""
     @State var isShowingSheet = false
-    
-    @Query var products: [Product]
-    
-    init() {
-        _products = Query(
-            filter: #Predicate<Product> {
-                if(search.isEmpty) { true }
-                else { $0.name.contains(search) }
-            },
-            sort: [SortDescriptor(\Product.name)]
-        )
-    }
-    
+        
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVGrid(columns: [GridItem(), GridItem()]) {
-                    ForEach(products) { product in
-                        NavigationLink {
-                            ProductDetailView(product: product)
-                                .navigationBarTitleDisplayMode(.inline)
-                                .navigationBarBackButtonHidden()
-                        } label: {
-                            VStack {
-                                ProductImage(data: product.imageData)
-                                Text(product.name)
-                            }
-                            .tint(.primary)
-                        }
-                    }
-                }
+                ProductListView(searchQuery: search)
                 .navigationTitle("Products")
                 .padding()
                 .toolbar(content: {
@@ -60,26 +34,55 @@ struct ProductsView: View {
                 })
                 .searchable(text: $search)
             }
-            .overlay {
-                if(products.isEmpty && search.isEmpty) {
-                    VStack {
-                        Spacer()
-                        Image(systemName: "tray.fill")
-                            .imageScale(.large)
-                            .font(.largeTitle)
-                            .padding(.bottom)
-                        Group {
-                            Text("No products found in storage.")
-                            Text("Click plus button to create products.")
-                        }
-                        .multilineTextAlignment(.center)
-                        Spacer()
-                    }
-                    .foregroundStyle(.gray)
-                }
-            }
         }
     }
+}
+
+struct ProductListView: View {
+    @Query(sort: \Product.name) var products: [Product]
+    
+    var searchQuery: String
+    
+    init(searchQuery: String) {
+        if(searchQuery.count > 0) {
+            _products = Query(filter: #Predicate<Product> { $0.name.contains(searchQuery) })
+        }
+        self.searchQuery = searchQuery
+    }
+    
+    var body: some View {
+        if(products.isEmpty && searchQuery.isEmpty) {
+            VStack {
+                Spacer()
+                Image(systemName: "tray.fill")
+                    .imageScale(.large)
+                    .font(.largeTitle)
+                    .padding(.bottom)
+                Group {
+                    Text("No products found in storage.")
+                    Text("Click plus button to create products.")
+                }
+                .multilineTextAlignment(.center)
+                Spacer()
+            }
+            .foregroundStyle(.gray)
+        } else {
+            LazyVGrid(columns: [GridItem(), GridItem()]) {
+                ForEach(products) { product in
+                    NavigationLink {
+                        ProductDetailView(product: product)
+                            .navigationBarTitleDisplayMode(.inline)
+                            .navigationBarBackButtonHidden()
+                    } label: {
+                        VStack {
+                            ProductImage(data: product.imageData)
+                            Text(product.name)
+                        }
+                        .tint(.primary)
+                    }
+                }
+            }
+        }    }
 }
 
 #Preview {
