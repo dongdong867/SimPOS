@@ -31,7 +31,9 @@ struct ProductsView: View {
                 LazyVGrid(columns: [GridItem(), GridItem()]) {
                     ForEach(products) { product in
                         NavigationLink {
-                            Text(product.name)
+                            ProductDetailView(product: product)
+                                .navigationBarTitleDisplayMode(.inline)
+                                .navigationBarBackButtonHidden()
                         } label: {
                             VStack {
                                 ProductImage(data: product.imageData)
