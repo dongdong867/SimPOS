@@ -52,20 +52,7 @@ struct ProductListView: View {
     
     var body: some View {
         if(products.isEmpty && searchQuery.isEmpty) {
-            VStack {
-                Spacer()
-                Image(systemName: "tray.fill")
-                    .imageScale(.large)
-                    .font(.largeTitle)
-                    .padding(.bottom)
-                Group {
-                    Text("No products found in storage.")
-                    Text("Click plus button to create products.")
-                }
-                .multilineTextAlignment(.center)
-                Spacer()
-            }
-            .foregroundStyle(.gray)
+            emptyStoragePlaceholder
         } else {
             LazyVGrid(columns: [GridItem(), GridItem()]) {
                 ForEach(products) { product in
@@ -82,7 +69,25 @@ struct ProductListView: View {
                     }
                 }
             }
-        }    }
+        }
+    }
+    
+    var emptyStoragePlaceholder: some View {
+        VStack {
+            Spacer()
+            Image(systemName: "tray.fill")
+                .imageScale(.large)
+                .font(.largeTitle)
+                .padding(.bottom)
+            Group {
+                Text("No products found in storage.")
+                Text("Click plus button to create products.")
+            }
+            .multilineTextAlignment(.center)
+            Spacer()
+        }
+        .foregroundStyle(.gray)
+    }
 }
 
 #Preview {
