@@ -18,85 +18,99 @@ struct ProductDetailView: View {
     var body: some View {
         VStack(alignment: .leading) {
             ProductImage(data: product.imageData)
-            
-            VStack(alignment: .leading) {
-                Text(product.name)
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Text(
-                    product.price,
-                    format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-                )
-                .font(.title2)
-                .fontWeight(.medium)
-            }
-            .padding()
-            
+                .scaledToFit()
+            productInfo
             Spacer()
-            
-            HStack {
-                Spacer()
-                Button(action: { amount -= 1 }) {
-                    Image(systemName: "minus")
-                }
-                
-                TextField("", value: $amount, format: .number)
-                    .keyboardType(.numberPad)
-                    .frame(maxWidth: 60)
-                    .padding(.vertical, 4)
-                    .padding(.horizontal)
-                    .multilineTextAlignment(.center)
-                    .background {
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(.gray)
-                    }
-                
-                Button(action: { amount += 1 }) {
-                    Image(systemName: "plus")
-                }
-                Spacer()
-            }
-            .font(.title2)
-            .fontWeight(.bold)
-            
+            amountStepper
             Spacer()
-            
-            Button(action: {}) {
-                Text("Add to shop cart.")
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .fontWeight(.medium)
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.horizontal)
+            addToCartButton
         }
         .edgesIgnoringSafeArea(.top)
         .overlay {
-            VStack {
-                HStack{
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.backward")
-                            .imageScale(.large)
-                    }
-                    .padding(10)
-                    .background(.white.opacity(0.2))
-                    .clipShape(Circle())
-                    
-                    Spacer()
-                    
-                    Button(action: {}) {
-                        Text("Edit")
-                    }
-                    .padding(10)
-                    .background(.white.opacity(0.2))
-                    .clipShape(Capsule())
+            navigationBar
+        }
+    }
+    
+    var productInfo: some View {
+        VStack(alignment: .leading) {
+            Text(product.name)
+                .font(.title)
+                .fontWeight(.bold)
+            
+            Text(
+                product.price,
+                format: .currency(code: Locale.current.currency?.identifier ?? "USD")
+            )
+            .font(.title2)
+            .fontWeight(.medium)
+        }
+        .padding()
+    }
+    
+    var amountStepper: some View {
+        HStack {
+            Spacer()
+            Button(action: { amount -= 1 }) {
+                Image(systemName: "minus")
+            }
+            
+            TextField("", value: $amount, format: .number)
+                .keyboardType(.numberPad)
+                .frame(maxWidth: 60)
+                .padding(.vertical, 4)
+                .padding(.horizontal)
+                .multilineTextAlignment(.center)
+                .background {
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(.gray)
                 }
+            
+            Button(action: { amount += 1 }) {
+                Image(systemName: "plus")
+            }
+            Spacer()
+        }
+        .font(.title2)
+        .fontWeight(.bold)
+    }
+    
+    var addToCartButton: some View {
+        Button(action: {}) {
+            Text("Add to shop cart.")
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .fontWeight(.medium)
+        }
+        .buttonStyle(.borderedProminent)
+        .padding(.horizontal)
+    }
+    
+    var navigationBar: some View {
+        VStack {
+            HStack{
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.backward")
+                        .imageScale(.large)
+                }
+                .padding(8)
+                .background(.background)
+                .clipShape(Circle())
                 
                 Spacer()
+                
+                Button(action: {}) {
+                    Text("Edit")
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal)
+                .background(.background)
+                .clipShape(Capsule())
             }
-            .foregroundStyle(.white)
-            .padding(.horizontal)
+            
+            Spacer()
         }
+        .foregroundStyle(.tint)
+        .fontWeight(.medium)
+        .padding(.horizontal)
     }
 }
