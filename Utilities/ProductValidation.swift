@@ -16,23 +16,27 @@ struct ProductValidation {
     var priceErrorDescription = ""
     
     
-    mutating func validateName(input name: String) {
+    mutating func validateName(input name: String) -> Bool {
         if(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
             hasNameError = true
             nameErrorDescription = "This field is required."
+            return false
         } else {
             hasNameError = false
             nameErrorDescription = ""
+            return true
         }
     }
     
-    mutating func validatePrice(input price: Float?) {
-        if(price == nil) {
+    mutating func validatePrice(input price: Float) -> Bool {
+        if(price.isEqual(to: 0)) {
             hasPriceError = true
-            priceErrorDescription = "This field is required."
+            priceErrorDescription = "0 is not acceptable for price."
+            return false
         } else {
             hasPriceError = false
             priceErrorDescription = ""
+            return true
         }
     }
 }
