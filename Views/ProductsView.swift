@@ -9,30 +9,39 @@ import SwiftData
 import SwiftUI
 
 struct ProductsView: View {
+    @Environment(\.modelContext) var modelContext
     
     @State var search: String = ""
     @State var isShowingSheet = false
-        
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 ProductListView(searchQuery: search)
-                .navigationTitle("Products")
-                .padding()
-                .toolbar(content: {
-                    ToolbarItemGroup {
-                        Button {
-                            isShowingSheet.toggle()
-                        } label: {
-                            Image(systemName: "plus")
+                    .navigationTitle("Products")
+                    .padding()
+                    .toolbar(content: {
+                        ToolbarItemGroup {
+                            Button {
+                                isShowingSheet.toggle()
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .sheet(isPresented: $isShowingSheet) {
+                                EditProductSheet(product: Product(
+                                    imageData: nil,
+                                    name: "",
+                                    price: 0,
+                                    cost: nil,
+                                    storage: nil
+                                )){
+                                    modelContext.insert($0)
+                                }
+                                
+                            }
                         }
-                        .sheet(isPresented: $isShowingSheet) {
-                            CreateProductSheet()
-                                .presentationDragIndicator(.visible)
-                        }
-                    }
-                })
-                .searchable(text: $search)
+                    })
+                    .searchable(text: $search)
             }
         }
     }
@@ -87,7 +96,10 @@ struct ProductListView: View {
             Spacer()
         }
         .foregroundStyle(.gray)
+        .frame(minHeight: 200)
     }
+    
+    
 }
 
 #Preview {
