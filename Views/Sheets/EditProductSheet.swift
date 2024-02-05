@@ -1,5 +1,5 @@
 //
-//  CreateProductSheet.swift
+//  EditProductSheet.swift
 //  SimPOS
 //
 //  Created by Dong on 2024/2/1.
@@ -8,17 +8,23 @@
 import PhotosUI
 import SwiftUI
 
-struct CreateProductSheet: View {
+struct EditProductSheet: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) private var dismiss
     
-    @State var name: String = ""
-    @State var price: Float?
-    @State var cost: Float?
-    @State var storage: Int?
+    @Bindable var product: Product
+
     @State var selectedImage: PhotosPickerItem? = nil
     @State var selectedImageData: Data? = nil
     @State var validation = ProductValidation()
+    
+    var title = "Create product"
+    var save: (Product) -> Void
+    let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.zeroSymbol = "0"
+        return formatter
+    }()
     
     
     var body: some View {
@@ -28,16 +34,23 @@ struct CreateProductSheet: View {
                 imageSelector
             }
             .multilineTextAlignment(.trailing)
-            .navigationTitle("Create product")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
+            .presentationDragIndicator(.visible)
             .toolbar(content: {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        createProduct()
-                    } label: {
-                        Text("Save")
+                if(title == "Create product") {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            let nameValidation = validation.validateName(input: product.name)
+                            let priceValidation = validation.validatePrice(input: product.price)
+                            if(nameValidation && priceValidation) {
+                                save(product)
+                                dismiss()
+                            }
+                        } label: {
+                            Text("Save")
+                        }
                     }
-                    .disabled(name.isEmpty || price == nil || validation.hasNameError || validation.hasPriceError)
                 }
             })
         }
@@ -62,11 +75,12 @@ struct CreateProductSheet: View {
                     Task {
                         if let data = try? await image?.loadTransferable(type: Data.self) {
                             selectedImageData = data
+                            product.imageData = data
                         }
                     }
                 }
-            if let selectedImageData,
-               let image = UIImage(data: selectedImageData) {
+            if let imageData = selectedImageData,
+               let image = UIImage(data: imageData) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
@@ -81,10 +95,7 @@ struct CreateProductSheet: View {
         VStack(alignment: .trailing) {
             HStack {
                 Text("Name")
-                TextField("Required", text: $name)
-                    .onChange(of: name) { _, newValue in
-                        validation.validateName(input: newValue)
-                    }
+                TextField("Required", text: $product.name)
             }
             
             if(validation.hasNameError) {
@@ -97,11 +108,8 @@ struct CreateProductSheet: View {
         VStack {
             HStack {
                 Text("Price")
-                TextField("Required", value: $price, format: .number)
-                    .keyboardType(.numberPad)
-                    .onChange(of: price) { _, newValue in
-                        validation.validatePrice(input: newValue)
-                    }
+                TextField("Required", value: $product.price, formatter: numberFormatter)
+                    .keyboardType(.decimalPad)
             }
             
             if(validation.hasPriceError) {
@@ -113,16 +121,17 @@ struct CreateProductSheet: View {
     var costField: some View {
         HStack {
             Text("Cost")
-            TextField("", value: $cost, format: .number)
-                .keyboardType(.numberPad)
+            TextField("", value: $product.cost, format: .number)
+                .keyboardType(.decimalPad)
         }
     }
     
     var storageField: some View {
         HStack {
             Text("Storage")
-            TextField("", value: $storage, format: .number)
-                .keyboardType(.numberPad)        }
+            TextField("", value: $product.storage, format: .number)
+                .keyboardType(.numberPad)
+        }
     }
     
     func errorLabel(_ description: String) -> some View {
@@ -133,22 +142,8 @@ struct CreateProductSheet: View {
         .foregroundStyle(.red)
     }
     
-    // MARK: - CRUD
-    
-    func createProduct() {
-        let product = Product(
-            imageData: selectedImageData,
-            name: name,
-            price: price ?? 0,
-            cost: cost,
-            storage: storage
-        )
-
-        modelContext.insert(product)
-        dismiss()
-    }
 }
 
 #Preview {
-    CreateProductSheet()
+    EditProductSheet(product: Product(imageData: nil, name: "", price: 0, cost: nil, storage: nil)) { _ in }
 }
