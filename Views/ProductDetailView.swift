@@ -53,6 +53,7 @@ struct ProductDetailView: View {
             Button(action: { amount -= 1 }) {
                 Image(systemName: "minus")
             }
+            .disabled(amount == 0)
             
             TextField("", value: $amount, format: .number)
                 .keyboardType(.numberPad)
@@ -68,6 +69,7 @@ struct ProductDetailView: View {
             Button(action: { amount += 1 }) {
                 Image(systemName: "plus")
             }
+            .disabled(amount == product.storage)
             Spacer()
         }
         .font(.title2)
