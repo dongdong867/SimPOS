@@ -10,9 +10,13 @@ import SwiftUI
 
 struct ProductDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
+    
     @State var amount: Int = 0
+    @State var amountIsOverStorage: Bool = false
+    @State var productToEdit: Product?
 
-    let product: Product
+    var product: Product
     
     
     var body: some View {
@@ -28,6 +32,14 @@ struct ProductDetailView: View {
         .edgesIgnoringSafeArea(.top)
         .overlay {
             navigationBar
+        }
+        .sheet(item: $productToEdit) { editingProduct in
+            EditProductSheet(
+                product: editingProduct,
+                selectedImageData: editingProduct.imageData, 
+                title: "Update product"
+            ) { _ in }
+                .presentationDragIndicator(.visible)
         }
     }
     
@@ -48,32 +60,40 @@ struct ProductDetailView: View {
     }
     
     var amountStepper: some View {
-        HStack {
-            Spacer()
-            Button(action: { amount -= 1 }) {
-                Image(systemName: "minus")
+        VStack {
+            if let storage = product.storage {
+                Text("Current storage: \(storage)")
             }
-            .disabled(amount == 0)
             
-            TextField("", value: $amount, format: .number)
-                .keyboardType(.numberPad)
-                .frame(maxWidth: 60)
-                .padding(.vertical, 4)
-                .padding(.horizontal)
-                .multilineTextAlignment(.center)
-                .background {
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(.gray)
+            HStack {
+                Spacer()
+                Button(action: { amount -= 1 }) {
+                    Image(systemName: "minus")
                 }
-            
-            Button(action: { amount += 1 }) {
-                Image(systemName: "plus")
+                .disabled(amount == 0)
+                
+                TextField("", value: $amount, format: .number)
+                    .keyboardType(.numberPad)
+                    .frame(maxWidth: 60)
+                    .padding(4)
+                    .multilineTextAlignment(.center)
+                    .background {
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(amountIsOverStorage ? .red : .gray)
+                    }
+                    .onChange(of: amount) { oldValue, newValue in
+                        amountIsOverStorage = amount > product.storage ?? amount+1
+                    }
+                
+                Button(action: { amount += 1 }) {
+                    Image(systemName: "plus")
+                }
+                .disabled(amountIsOverStorage)
+                Spacer()
             }
-            .disabled(amount == product.storage)
-            Spacer()
+            .font(.title2)
+            .fontWeight(.bold)
         }
-        .font(.title2)
-        .fontWeight(.bold)
     }
     
     var addToCartButton: some View {
@@ -85,6 +105,7 @@ struct ProductDetailView: View {
         }
         .buttonStyle(.borderedProminent)
         .padding(.horizontal)
+        .disabled(amount == 0 || amountIsOverStorage)
     }
     
     var navigationBar: some View {
@@ -100,7 +121,7 @@ struct ProductDetailView: View {
                 
                 Spacer()
                 
-                Button(action: {}) {
+                Button(action: { productToEdit = product }) {
                     Text("Edit")
                 }
                 .padding(.vertical, 8)
