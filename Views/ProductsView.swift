@@ -71,7 +71,7 @@ struct ProductListView: View {
                             .navigationBarBackButtonHidden()
                     } label: {
                         VStack {
-                            ProductImage(data: product.imageData)
+                            DataImage(data: product.imageData)
                             Text(product.name)
                         }
                         .tint(.primary)

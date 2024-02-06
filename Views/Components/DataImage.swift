@@ -1,5 +1,5 @@
 //
-//  ProductImage.swift
+//  DataImage.swift
 //  SimPOS
 //
 //  Created by Dong on 2024/2/4.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ProductImage: View {
+struct DataImage: View {
     let data: Data?
     
     var body: some View {

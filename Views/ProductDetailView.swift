@@ -21,7 +21,7 @@ struct ProductDetailView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            ProductImage(data: product.imageData)
+            DataImage(data: product.imageData)
                 .scaledToFit()
             productInfo
             Spacer()
