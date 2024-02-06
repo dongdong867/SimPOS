@@ -17,62 +17,74 @@ struct ShoppingCartDetail: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(shoppingCart.cart) { item in
-                    HStack(spacing: 12) {
-                        DataImage(data: item.product.imageData)
-                            .frame(maxWidth: 100)
-                        VStack(alignment: .leading) {
-                            Text(item.product.name)
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            Text("Amount: \(item.amount)")
-                            HStack {
-                                Spacer()
-                                Text(
-                                    item.total,
-                                    format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-                                )
-                                .fontWeight(.semibold)
-                                .onAppear {
-                                    subtotal += item.total
-                                }
-                            }
-                        }
-                        Spacer()
-                    }
-                    .padding()
-                }
+                cartList
                 Divider()
             }
-            VStack(alignment: .leading) {
-                Label("Notes", systemImage: "note.text")
-                TextField("Add notes here.", text: $note)
-                    .textFieldStyle(.roundedBorder)
-                Divider()
-                    .padding(.vertical)
-                HStack {
-                    Label("Subtotal", systemImage: "dollarsign.circle")
-                    Spacer()
-                    Text(
-                        subtotal,
-                        format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-                    )
+            orderInfo
+        }
+        .overlay {
+            createOrderButton
+        }
+    }
+    
+    var cartList: some View {
+        ForEach(shoppingCart.cart) { item in
+            HStack(spacing: 12) {
+                DataImage(data: item.product.imageData)
+                    .frame(maxWidth: 100)
+                VStack(alignment: .leading) {
+                    Text(item.product.name)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    Text("Amount: \(item.amount)")
+                    HStack {
+                        Spacer()
+                        Text(
+                            item.total,
+                            format: .currency(code: Locale.current.currency?.identifier ?? "USD")
+                        )
+                        .fontWeight(.semibold)
+                        .onAppear {
+                            subtotal += item.total
+                        }
+                    }
                 }
-                .fontWeight(.bold)
+                Spacer()
             }
             .padding()
         }
-        .overlay {
-            VStack {
+    }
+    
+    var orderInfo: some View {
+        VStack(alignment: .leading) {
+            Label("Notes", systemImage: "note.text")
+            TextField("Add notes here.", text: $note)
+                .textFieldStyle(.roundedBorder)
+            Divider()
+                .padding(.vertical)
+            HStack {
+                Label("Subtotal", systemImage: "dollarsign.circle")
                 Spacer()
-                Button(action: { createOrder() }) {
-                    Text("Create order")
-                        .frame(maxWidth: .infinity)
-                        .padding(8)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding()
+                Text(
+                    subtotal,
+                    format: .currency(code: Locale.current.currency?.identifier ?? "USD")
+                )
             }
+            .fontWeight(.bold)
+        }
+        .padding()
+    }
+    
+    var createOrderButton: some View {
+        VStack {
+            Spacer()
+            Button(action: { createOrder() }) {
+                Text("Create order")
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding()
         }
     }
     
