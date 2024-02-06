@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ProductsView: View {
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var shoppingCart: ShoppingCart
     
     @State var search: String = ""
     @State var isShowingSheet = false
@@ -42,6 +43,14 @@ struct ProductsView: View {
                         }
                     })
                     .searchable(text: $search)
+            }
+            .overlay {
+                if(!shoppingCart.cart.isEmpty) {
+                    VStack {
+                        Spacer()
+                        ShoppingCartButton()
+                    }
+                }
             }
         }
     }
@@ -76,8 +85,7 @@ struct ProductListView: View {
                         }
                         .tint(.primary)
                     }
-                }
-            }
+                }            }
         }
     }
     
@@ -105,4 +113,5 @@ struct ProductListView: View {
 #Preview {
     ProductsView()
         .modelContainer(for: [Product.self, Order.self, OrderProduct.self])
+        .environmentObject(ShoppingCart())
 }
