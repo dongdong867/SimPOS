@@ -11,6 +11,7 @@ import SwiftUI
 struct ProductDetailView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var shoppingCart: ShoppingCart
     
     @State var amount: Int = 0
     @State var amountIsOverStorage: Bool = false
@@ -97,7 +98,10 @@ struct ProductDetailView: View {
     }
     
     var addToCartButton: some View {
-        Button(action: {}) {
+        Button(action: {
+            shoppingCart.addToCart(ShoppingCart.ShoppingCartItem(product: product, amount: amount))
+            dismiss()
+        }) {
             Text("Add to shop cart.")
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
