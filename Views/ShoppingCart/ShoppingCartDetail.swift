@@ -101,7 +101,7 @@ struct ShoppingCartDetail: View {
             orderNumber: orderNumber,
             createTime: Date(),
             orderProducts: [],
-            addition: note,
+            note: note,
             finished: false
         )
         modelContext.insert(order)
