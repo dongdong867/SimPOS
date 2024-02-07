@@ -98,9 +98,10 @@ struct ShoppingCartDetail: View {
         }
         
         let order = Order(
-            orderNumber: orderNumber,
-            createTime: Date(),
             orderProducts: [],
+            createTime: Date(),
+            orderNumber: orderNumber,
+            subtotal: subtotal,
             note: note,
             finished: false
         )
