@@ -108,7 +108,7 @@ struct ProductDetailView: View {
                 .fontWeight(.medium)
         }
         .buttonStyle(.borderedProminent)
-        .padding(.horizontal)
+        .padding()
         .disabled(amount == 0 || amountIsOverStorage)
     }
     

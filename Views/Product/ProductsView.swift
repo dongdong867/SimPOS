@@ -43,6 +43,7 @@ struct ProductsView: View {
                         }
                     })
                     .searchable(text: $search)
+                Spacer(minLength: 80)
             }
             .overlay {
                 if(!shoppingCart.cart.isEmpty) {

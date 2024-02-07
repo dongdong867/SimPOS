@@ -21,6 +21,7 @@ struct ShoppingCartDetail: View {
                 Divider()
             }
             orderInfo
+            Spacer(minLength: 80)
         }
         .overlay {
             createOrderButton
@@ -92,7 +93,7 @@ struct ShoppingCartDetail: View {
         let userDefault = UserDefaults.standard
         let orderNumber = userDefault.integer(forKey: "orderNumber")
         if(orderNumber < 100) {
-            userDefault.setValue(orderNumber+1, forKey: "orderNubmer")
+            userDefault.setValue(orderNumber+1, forKey: "orderNumber")
         } else {
             userDefault.setValue(0, forKey: "orderNumber")
         }
