@@ -17,15 +17,17 @@ final class Order {
     var orderProducts: [OrderProduct] = []
     
     let createTime: Date
-    var addition: String
+    let orderNumber: Int
+    var note: String
     var finished: Bool
     
     
-    init(orderNumber: Int, createTime: Date, orderProducts: [OrderProduct], addition: String, finished: Bool) {
+    init(orderNumber: Int, createTime: Date, orderProducts: [OrderProduct], note: String, finished: Bool) {
         self.id = UUID().uuidString
+        self.orderNumber = orderNumber
         self.createTime = createTime
         self.orderProducts = orderProducts
-        self.addition = addition
+        self.note = note
         self.finished = finished
     }
     
