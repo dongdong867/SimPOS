@@ -17,7 +17,23 @@ struct OrdersView: View {
                 orderListItem(order)
             }
             .navigationTitle("Orders")
+            .overlay {
+                if(orders.isEmpty) {
+                    emptyPlaceholder
+                }
+            }
         }
+    }
+    
+    var emptyPlaceholder: some View {
+        VStack {
+            Image(systemName: "clipboard.fill")
+                .imageScale(.large)
+                .font(.largeTitle)
+                .padding(.bottom)
+            Text("No orders found in storage.")
+        }
+        .foregroundStyle(.gray)
     }
     
     func orderListItem(_ order: Order) -> some View {
