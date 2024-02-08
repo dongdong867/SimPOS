@@ -64,7 +64,9 @@ struct ProductListView: View {
     
     init(searchQuery: String) {
         if(searchQuery.count > 0) {
-            _products = Query(filter: #Predicate<Product> { $0.name.contains(searchQuery) })
+            _products = Query(filter: #Predicate<Product> {
+                $0.name.localizedStandardContains(searchQuery)
+            })
         }
         self.searchQuery = searchQuery
     }
