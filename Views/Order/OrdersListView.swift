@@ -1,5 +1,5 @@
 //
-//  OrdersList.swift
+//  OrdersListView.swift
 //
 //
 //  Created by Dong on 2024/2/8.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct OrdersList: View {
+struct OrdersListView: View {
     @Query(sort: \Order.createTime, order: .reverse) var orders: [Order]
     @State var sortWith: SortWith = .time
     
@@ -137,6 +137,6 @@ struct OrdersList: View {
 }
 
 #Preview {
-    OrdersList()
+    OrdersListView()
         .modelContainer(for: [Product.self, Order.self, OrderProduct.self])
 }
