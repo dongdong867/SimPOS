@@ -13,22 +13,16 @@ struct OrdersList: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack {
-                    ForEach(orders) { order in
-                        Divider()
-                        orderListItem(order)
-                    }
-                }
-                .padding(.horizontal)
-                .navigationTitle("Orders")
+            List(orders) { order in
+                orderListItem(order)
             }
+            .navigationTitle("Orders")
         }
     }
     
     func orderListItem(_ order: Order) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            orderTitle(order)
+            title(order)
             productList(order)
             if(!order.note.isEmpty){
                 notes(order)
@@ -36,19 +30,27 @@ struct OrdersList: View {
             subtotal(order)
             createTime(order)
         }
-        .padding(8)
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            if(!order.finished) {
+                Button {
+                    order.finished.toggle()
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+                .tint(.green)
+            }
+        }
     }
     
-    func orderTitle(_ order: Order) -> some View {
+    func title(_ order: Order) -> some View {
         HStack {
-            Text("No. \(order.orderNumber)")
-                .font(.title2)
-                .fontWeight(.semibold)
             if(order.finished) {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
             }
-            
+            Text("No. \(order.orderNumber)")
+                .font(.title2)
+                .fontWeight(.semibold)
         }
     }
     
@@ -58,7 +60,7 @@ struct OrdersList: View {
                 HStack {
                     HStack {
                         Text(item.product.name)
-                        Text("X\(item.amount)")
+                        Text("x\(item.amount)")
                     }
                     Spacer()
                     Text(
@@ -73,9 +75,14 @@ struct OrdersList: View {
     }
     
     func notes(_ order: Order) -> some View {
-        Text(order.note)
-            .font(.callout)
-            .foregroundStyle(.gray)
+        VStack(alignment: .leading) {
+            Text("Note:")
+            Text(order.note)
+            Divider()
+        }
+        .font(.callout)
+        .foregroundStyle(.gray)
+        .padding(.leading, 8)
     }
     
     func subtotal(_ order: Order) -> some View {
@@ -85,7 +92,7 @@ struct OrdersList: View {
             Text(order.subtotal, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
         }
         .font(.headline)
-
+        
     }
     
     func createTime(_ order: Order) -> some View {
