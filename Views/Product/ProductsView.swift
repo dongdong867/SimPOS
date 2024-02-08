@@ -17,42 +17,40 @@ struct ProductsView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                ProductListView(searchQuery: search)
-                    .navigationTitle("Products")
-                    .padding()
-                    .toolbar(content: {
-                        ToolbarItemGroup {
-                            Button {
-                                isShowingSheet.toggle()
-                            } label: {
-                                Image(systemName: "plus")
-                            }
-                            .sheet(isPresented: $isShowingSheet) {
-                                EditProductSheet(product: Product(
-                                    imageData: nil,
-                                    name: "",
-                                    price: 0,
-                                    cost: nil,
-                                    storage: nil
-                                )){
-                                    modelContext.insert($0)
-                                }
-                                
-                            }
+            ProductListView(searchQuery: search)
+                .navigationTitle("Products")
+                .padding()
+                .toolbar(content: {
+                    ToolbarItemGroup {
+                        Button {
+                            isShowingSheet.toggle()
+                        } label: {
+                            Image(systemName: "plus")
                         }
-                    })
-                    .searchable(text: $search)
-                Spacer(minLength: 80)
-            }
-            .overlay {
-                if(!shoppingCart.cart.isEmpty) {
-                    VStack {
-                        Spacer()
-                        ShoppingCartButton()
+                        .sheet(isPresented: $isShowingSheet) {
+                            EditProductSheet(product: Product(
+                                imageData: nil,
+                                name: "",
+                                price: 0,
+                                cost: nil,
+                                storage: nil
+                            )){
+                                modelContext.insert($0)
+                            }
+                            
+                        }
+                    }
+                })
+                .searchable(text: $search)
+            Spacer(minLength: 80)
+                .overlay {
+                    if(!shoppingCart.cart.isEmpty) {
+                        VStack {
+                            Spacer()
+                            ShoppingCartButton()
+                        }
                     }
                 }
-            }
         }
     }
 }
@@ -72,9 +70,7 @@ struct ProductListView: View {
     }
     
     var body: some View {
-        if(products.isEmpty && searchQuery.isEmpty) {
-            emptyStoragePlaceholder
-        } else {
+        ScrollView {
             LazyVGrid(columns: [GridItem(), GridItem()]) {
                 ForEach(products) { product in
                     NavigationLink {
@@ -88,7 +84,13 @@ struct ProductListView: View {
                         }
                         .tint(.primary)
                     }
-                }            }
+                }
+            }
+        }
+        .overlay {
+            if(products.isEmpty && searchQuery.isEmpty) {
+                emptyStoragePlaceholder
+            }
         }
     }
     
@@ -107,7 +109,7 @@ struct ProductListView: View {
             Spacer()
         }
         .foregroundStyle(.gray)
-        .frame(minHeight: 200)
+        //        .frame(minHeight: 200)
     }
     
     
