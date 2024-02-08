@@ -10,6 +10,7 @@ import SwiftUI
 
 struct OrdersList: View {
     @Query(sort: \Order.createTime, order: .reverse) var orders: [Order]
+    @State var sortWith: SortWith = .time
     
     var body: some View {
         NavigationStack {
@@ -17,6 +18,39 @@ struct OrdersList: View {
                 orderListItem(order)
             }
             .navigationTitle("Orders")
+            .toolbar {
+                Menu {
+                    Picker("sortWith", selection: $sortWith) {
+                        ForEach(SortWith.allCases, id: \.self) {
+                            Label($0.getCaseDescription(), systemImage: $0.getCaseSystemImageName())
+                        }
+                    }
+                } label: {
+                    Label("sort", systemImage: "line.3.horizontal.decrease.circle")
+                }
+            }
+        }
+    }
+    
+    enum SortWith: String, CaseIterable {
+        case time, finished
+        
+        func getCaseDescription() -> String {
+            switch self {
+                case .time:
+                    return "Latest"
+                case .finished:
+                    return "Unfinished"
+            }
+        }
+        
+        func getCaseSystemImageName() -> String {
+            switch self {
+                case .time:
+                    return "clock"
+                case .finished:
+                    return "checkmark.circle"
+            }
         }
     }
     
