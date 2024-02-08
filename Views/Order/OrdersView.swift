@@ -1,5 +1,5 @@
 //
-//  OrdersListView.swift
+//  OrdersView.swift
 //
 //
 //  Created by Dong on 2024/2/8.
@@ -8,9 +8,8 @@
 import SwiftData
 import SwiftUI
 
-struct OrdersListView: View {
+struct OrdersView: View {
     @Query(sort: \Order.createTime, order: .reverse) var orders: [Order]
-    @State var sortWith: SortWith = .time
     
     var body: some View {
         NavigationStack {
@@ -18,39 +17,6 @@ struct OrdersListView: View {
                 orderListItem(order)
             }
             .navigationTitle("Orders")
-            .toolbar {
-                Menu {
-                    Picker("sortWith", selection: $sortWith) {
-                        ForEach(SortWith.allCases, id: \.self) {
-                            Label($0.getCaseDescription(), systemImage: $0.getCaseSystemImageName())
-                        }
-                    }
-                } label: {
-                    Label("sort", systemImage: "line.3.horizontal.decrease.circle")
-                }
-            }
-        }
-    }
-    
-    enum SortWith: String, CaseIterable {
-        case time, finished
-        
-        func getCaseDescription() -> String {
-            switch self {
-                case .time:
-                    return "Latest"
-                case .finished:
-                    return "Unfinished"
-            }
-        }
-        
-        func getCaseSystemImageName() -> String {
-            switch self {
-                case .time:
-                    return "clock"
-                case .finished:
-                    return "checkmark.circle"
-            }
         }
     }
     
@@ -134,9 +100,10 @@ struct OrdersListView: View {
             .font(.footnote)
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
+    
 }
 
 #Preview {
-    OrdersListView()
+    OrdersView()
         .modelContainer(for: [Product.self, Order.self, OrderProduct.self])
 }
