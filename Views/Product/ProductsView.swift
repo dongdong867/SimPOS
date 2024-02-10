@@ -42,7 +42,6 @@ struct ProductsView: View {
                     }
                 })
                 .searchable(text: $search)
-            Spacer(minLength: 80)
                 .overlay {
                     if(!shoppingCart.cart.isEmpty) {
                         VStack {
@@ -51,6 +50,7 @@ struct ProductsView: View {
                         }
                     }
                 }
+            Spacer(minLength: 80)
         }
     }
 }
