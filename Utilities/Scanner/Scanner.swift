@@ -9,7 +9,7 @@ import AVFoundation
 import SwiftUI
 
 struct Scanner: UIViewControllerRepresentable {
-    var completion: (Result<String, ScannerError>) -> Void
+    var completion: (Result<String, ScannerController.ScannerError>) -> Void
     
     func makeUIViewController(context: Context) -> some UIViewController {
         return ScannerController { result in

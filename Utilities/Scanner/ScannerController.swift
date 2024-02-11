@@ -27,7 +27,38 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         checkAuthorizationStatus()
+    }
+    
+    @objc
+    func orientationChanged() {
+//        switch UIDevice.current.orientation {
+//            case UIDeviceOrientation.portraitUpsideDown:
+//                self.previewLayer.connection?.videoRotationAngle = 180
+//                
+//            case UIDeviceOrientation.landscapeLeft:
+//                self.previewLayer.connection?.videoRotationAngle = 90
+//                
+//            case UIDeviceOrientation.landscapeRight:
+//                self.previewLayer.connection?.videoRotationAngle = -90
+//            
+//            default:
+//                self.previewLayer.connection?.videoRotationAngle = 90
+//        }
+        
+        switch UIDevice.current.orientation {
+            case .portrait:
+                self.previewLayer.connection?.videoOrientation = .portrait
+            case .landscapeLeft:
+                self.previewLayer.connection?.videoOrientation = .landscapeRight
+            case .landscapeRight:
+                self.previewLayer.connection?.videoOrientation = .landscapeLeft
+            case .portraitUpsideDown:
+                self.previewLayer.connection?.videoOrientation = .portraitUpsideDown
+            default:
+                self.previewLayer.connection?.videoOrientation = .portrait
+        }
     }
     
     func checkAuthorizationStatus() {
@@ -60,10 +91,17 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     func setCaptureDevice() {
         guard let captureDevice = AVCaptureDevice.default(for: .video)
         else {
-            completion(.failure(.notFound))
+            completion(.failure(.deviceNotFound))
             return
         }
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(orientationChanged),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+                
         let videoInput: AVCaptureDeviceInput
         do {
             videoInput = try AVCaptureDeviceInput(device: captureDevice)
@@ -74,13 +112,13 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
             
         let metadataOutput = AVCaptureMetadataOutput()
         captureSession.addOutput(metadataOutput)
-        metadataOutput.metadataObjectTypes = [.code128, .code39, .qr, .upce, .ean8, .ean13]
+        metadataOutput.metadataObjectTypes = [.qr, .upce, .ean8, .ean13]
         metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
     }
     
     func setPreviewLayer() {
-        previewLayer.frame = view.layer.bounds
-        previewLayer.videoGravity = .resizeAspect
+        previewLayer.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.width)
+        previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
     }
     
@@ -101,25 +139,24 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
             completion(.success(result))
         }
     }
-}
-
-enum ScannerError: Error {
-    case accessDenied, accessRestricted
-    case notFound
-    case unknown, customError(Error)
     
-    func description() -> String {
-        switch self {
-            case .accessDenied:
-                "Camera access denied."
-            case .accessRestricted:
-                "Camera access restricted."
-            case .notFound:
-                "Camera not found."
-            case .unknown:
-                "Unknown error occurred."
-            case .customError(let error):
-                error.localizedDescription
+    enum ScannerError: Error, LocalizedError {
+        case accessDenied, accessRestricted, deviceNotFound
+        case unknown, customError(Error)
+        
+        func description() -> String {
+            switch self {
+                case .accessDenied:
+                    "Camera access denied."
+                case .accessRestricted:
+                    "Camera access restricted."
+                case .deviceNotFound:
+                    "Camera not found."
+                case .unknown:
+                    "Unknown error occurred."
+                case .customError(let error):
+                    error.localizedDescription
+            }
         }
     }
 }
