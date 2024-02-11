@@ -19,15 +19,19 @@ class Product {
     @Relationship(deleteRule: .cascade, inverse: \OrderProduct.product)
     var orderProducts: [OrderProduct] = []
     
+    @Attribute(.unique)
+    var code: String?
+    
     var name: String
     var price: Float
     var cost: Float?
     var storage: Int?
     
     
-    init(imageData: Data? , name: String, price: Float, cost: Float?, storage: Int?) {
+    init(imageData: Data?, code: String? = nil, name: String, price: Float, cost: Float?, storage: Int?) {
         self.id = UUID().uuidString
         self.imageData = imageData
+        self.code = code
         self.name = name
         self.price = price
         self.cost = cost
