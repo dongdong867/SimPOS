@@ -9,11 +9,11 @@ import PhotosUI
 import SwiftUI
 
 struct EditProductSheet: View {
-    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) private var dismiss
     
     @Bindable var product: Product
 
+    @State var isScannerShow = false
     @State var selectedImage: PhotosPickerItem? = nil
     @State var selectedImageData: Data? = nil
     @State var validation = ProductValidation()
@@ -31,6 +31,7 @@ struct EditProductSheet: View {
         NavigationStack {
             Form {
                 productInfo
+                barCodeScanner
                 imageSelector
             }
             .multilineTextAlignment(.trailing)
@@ -65,6 +66,57 @@ struct EditProductSheet: View {
         Section("Optional Properties") {
             costField
             storageField
+        }
+    }
+    
+    var barCodeScanner: some View {
+        @State var scannerError: ScannerController.ScannerError?
+        @State var errorActionIsShow = false
+        
+        return HStack {
+            Button(action: { isScannerShow.toggle() }, label: {Text("Scan a barcode")})
+            Spacer()
+            Text(product.code ?? "")
+        }
+        .sheet(isPresented: $isScannerShow) {
+            VStack(spacing: 12) {
+                GeometryReader { gr in
+                    RoundedRectangle(cornerRadius: 12)
+                        .frame(width: gr.size.width, height: gr.size.width)
+                        .overlay {
+                            Scanner { result in
+                                switch result {
+                                    case .success(let success):
+                                        product.code = success
+                                        isScannerShow = false
+                                    case .failure(let failure):
+                                        scannerError = failure
+                                        errorActionIsShow.toggle()
+                                }
+                            }
+                            .clipped()
+                        }
+                }
+                .scaledToFit()
+                
+                HStack {
+                    Text(product.code ?? "")
+                    Spacer()
+                    Button(action: { product.code = nil }) {
+                        Image(systemName: "trash")
+                            .foregroundStyle(.red)
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .presentationDragIndicator(.visible)
+            .presentationDetents([.medium])
+            .padding()
+            .alert(scannerError?.description() ?? "", isPresented: $errorActionIsShow) {
+                Button(action: {errorActionIsShow.toggle()}) {
+                    Text("OK")
+                }
+            }
         }
     }
     
@@ -142,8 +194,4 @@ struct EditProductSheet: View {
         .foregroundStyle(.red)
     }
     
-}
-
-#Preview {
-    EditProductSheet(product: Product(imageData: nil, name: "", price: 0, cost: nil, storage: nil)) { _ in }
 }
