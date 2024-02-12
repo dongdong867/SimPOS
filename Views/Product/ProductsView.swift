@@ -30,6 +30,7 @@ struct ProductsView: View {
                         .sheet(isPresented: $isShowingSheet) {
                             EditProductSheet(product: Product(
                                 imageData: nil,
+                                code: nil,
                                 name: "",
                                 price: 0,
                                 cost: nil,
