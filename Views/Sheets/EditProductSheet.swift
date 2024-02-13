@@ -94,7 +94,7 @@ struct EditProductSheet: View {
                                         errorActionIsShow.toggle()
                                 }
                             }
-                            .clipped()
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                 }
                 .scaledToFit()
