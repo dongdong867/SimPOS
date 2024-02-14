@@ -31,6 +31,19 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
         checkAuthorizationStatus()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        DispatchQueue.main.async {
+            self.startSession()
+        }
+    }
+    
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        DispatchQueue.main.async {
+            self.captureSession.stopRunning()
+        }
+    }
+    
     @objc
     func orientationChanged() {
 //        switch UIDevice.current.orientation {
@@ -57,7 +70,7 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
             case .portraitUpsideDown:
                 self.previewLayer.connection?.videoOrientation = .portraitUpsideDown
             default:
-                self.previewLayer.connection?.videoOrientation = .portrait
+                return
         }
     }
     
@@ -73,9 +86,9 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
                         self.completion(.failure(.accessDenied))
                         return
                     }
-                    self.setCaptureDevice()
-                    self.setPreviewLayer()
                     DispatchQueue.main.async {
+                        self.setCaptureDevice()
+                        self.setPreviewLayer()
                         self.startSession()
                     }
                 }
