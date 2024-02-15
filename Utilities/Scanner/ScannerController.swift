@@ -130,9 +130,17 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     }
     
     func setPreviewLayer() {
-        previewLayer.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.width)
+        previewLayer.frame = CGRect(x: 0, y: 0, width: getPreviewFrameSize(), height: getPreviewFrameSize())
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
+    }
+    
+    func getPreviewFrameSize() -> CGFloat {
+        if(view.frame.width > view.frame.height) {
+            return min(view.frame.height, 500)
+        } else {
+            return min(view.frame.width, 500)
+        }
     }
     
     func startSession() {
