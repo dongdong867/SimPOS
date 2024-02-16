@@ -16,30 +16,31 @@ struct ProductDetailView: View {
     @State var amount: Int = 0
     @State var amountIsOverStorage: Bool = false
     @State var productToEdit: Product?
-
+    
     var product: Product
     
     var body: some View {
-        VStack(alignment: .leading) {
-            DataImage(data: product.imageData)
-                .scaledToFit()
-            productInfo
-            Spacer()
-            amountStepper
-            Spacer()
-            addToCartButton
+        GeometryReader { gr in
+            VStack(alignment: .leading) {
+                DataImage(data: product.imageData)
+                    .scaledToFill()
+                    .frame(maxHeight: gr.size.height/2)
+                    .clipped()
+                productInfo
+                Spacer()
+                amountStepper
+                Spacer()
+                addToCartButton
+            }
         }
-        .edgesIgnoringSafeArea(.top)
-        .overlay {
-            navigationBar
-        }
+        .ignoresSafeArea(edges: .top)
+        .overlay { navigationBar }
         .sheet(item: $productToEdit) { editingProduct in
             EditProductSheet(
                 product: editingProduct,
-                selectedImageData: editingProduct.imageData, 
+                selectedImageData: editingProduct.imageData,
                 title: "Update product"
-            ) { _ in }
-                .presentationDragIndicator(.visible)
+            )
         }
     }
     
@@ -124,8 +125,8 @@ struct ProductDetailView: View {
                 
                 Spacer()
                 
-                Button(action: { productToEdit = product }) {
-                    Text("Edit")
+                Button("Edit") {
+                    productToEdit = product
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal)
@@ -137,6 +138,6 @@ struct ProductDetailView: View {
         }
         .foregroundStyle(.tint)
         .fontWeight(.medium)
-        .padding(.horizontal)
+        .padding()
     }
 }
