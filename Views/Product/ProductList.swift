@@ -24,12 +24,16 @@ final class ProductList: ObservableObject {
             else {
                 $0.name.localizedStandardContains(query)
             }
-        })
+        }, sortBy: [.init(\.name), .init(\.code)])
 
         products = (try? modelContext.fetch(descriptor)) ?? []
     }
     
     func createProduct(_ product: Product) {
         modelContext.insert(product)
+    }
+    
+    func deleteProduct(_ product: Product) {
+        modelContext.delete(product)
     }
 }
