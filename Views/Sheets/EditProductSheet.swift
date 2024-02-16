@@ -12,14 +12,14 @@ struct EditProductSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     @Bindable var product: Product
-
+    
     @State var isScannerShow = false
     @State var selectedImage: PhotosPickerItem? = nil
     @State var selectedImageData: Data? = nil
     @State var validation = ProductValidation()
     
     var title = "Create product"
-    var save: (Product) -> Void
+    var save: ((Product) -> Void)?
     let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.zeroSymbol = "0"
@@ -31,13 +31,14 @@ struct EditProductSheet: View {
         NavigationStack {
             Form {
                 productInfo
-                barCodeScanner
-                imageSelector
+                Section {
+                    barCodeScanner
+                    imageSelector
+                }
             }
             .multilineTextAlignment(.trailing)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
-            .presentationDragIndicator(.visible)
             .toolbar(content: {
                 if(title == "Create product") {
                     ToolbarItem(placement: .confirmationAction) {
@@ -45,7 +46,7 @@ struct EditProductSheet: View {
                             let nameValidation = validation.validateName(input: product.name)
                             let priceValidation = validation.validatePrice(input: product.price)
                             if(nameValidation && priceValidation) {
-                                save(product)
+                                if(save != nil) { save!(product) }
                                 dismiss()
                             }
                         } label: {
@@ -79,10 +80,15 @@ struct EditProductSheet: View {
             Text(product.code ?? "")
         }
         .sheet(isPresented: $isScannerShow) {
-            VStack(spacing: 12) {
-                GeometryReader { gr in
+            GeometryReader { gr in
+                VStack(alignment: .center, spacing: 12) {
+                    Spacer()
+                    
                     RoundedRectangle(cornerRadius: 12)
-                        .frame(width: gr.size.width, height: gr.size.width)
+                        .frame(
+                            width: min(min(gr.size.width, gr.size.height), 500),
+                            height: min(min(gr.size.width, gr.size.height), 500)
+                        )
                         .overlay {
                             Scanner { result in
                                 switch result {
@@ -96,18 +102,21 @@ struct EditProductSheet: View {
                             }
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                }
-                .scaledToFit()
-                
-                HStack {
-                    Text(product.code ?? "")
-                    Spacer()
-                    Button(action: { product.code = nil }) {
-                        Image(systemName: "trash")
-                            .foregroundStyle(.red)
+                    
+                    HStack {
+                        Text(product.code ?? "")
+                        Spacer()
+                        Button(action: { product.code = nil }) {
+                            Image(systemName: "trash")
+                                .foregroundStyle(.red)
+                        }
                     }
+                    .padding(.horizontal)
+                    .frame(width: min(min(gr.size.width, gr.size.height), 500))
+                    
+                    Spacer()
                 }
-                .padding(.horizontal)
+                .frame(maxWidth: .infinity)
             }
             .presentationDragIndicator(.visible)
             .presentationDetents([.medium])
