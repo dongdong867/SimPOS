@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct ProductScannerView: View {
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var shoppingCart: ShoppingCart
     @ObservedObject var scanner: ProductScanner
 
@@ -53,7 +54,10 @@ struct ProductScannerView: View {
             .navigationTitle("Scanner")
             .sheet(isPresented: $productSheetIsShow, onDismiss: { scanResult = "" }) {
                 if let product = scanner.product {
-                    ProductDetailView(product: product)
+                    ProductDetailView(product: product) { productToDelete in
+                        scanner.modelContext.delete(productToDelete)
+                        dismiss()
+                    }
                 }
             }
             .onChange(of: scanResult) {
