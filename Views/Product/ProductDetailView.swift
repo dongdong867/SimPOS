@@ -15,9 +15,11 @@ struct ProductDetailView: View {
     
     @State var amount: Int = 0
     @State var amountIsOverStorage: Bool = false
+    @State var isDeleteAlertShow = false
     @State var productToEdit: Product?
     
     var product: Product
+    let delete: (Product) -> Void
     
     var body: some View {
         GeometryReader { gr in
@@ -117,7 +119,6 @@ struct ProductDetailView: View {
             HStack{
                 Button(action: { dismiss() }) {
                     Image(systemName: "chevron.backward")
-                        .imageScale(.large)
                 }
                 .padding(8)
                 .background(.background)
@@ -132,6 +133,23 @@ struct ProductDetailView: View {
                 .padding(.horizontal)
                 .background(.background)
                 .clipShape(Capsule())
+                
+                Button(action: { isDeleteAlertShow.toggle() }) {
+                    Image(systemName: "trash")
+                }
+                .tint(.red)
+                .padding(8)
+                .background(.background)
+                .clipShape(Circle())
+                .alert("Delete \(product.name)", isPresented: $isDeleteAlertShow) {
+                    Button("Delete", role: .destructive) {
+                        let productToDelete = product
+                        delete(productToDelete)
+                    dismiss()
+                    }
+                } message: {
+                    Text("Deleting product will remove all data contains product \(product.name).")
+                }
             }
             
             Spacer()
