@@ -5,21 +5,18 @@
 //  Created by Dong on 2024/2/6.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ShoppingCartDetail: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var shoppingCart: ShoppingCart
+    
     @State var note: String = ""
-    @State var subtotal: Float = 0
     
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                cartList
-                Divider()
-            }
+        VStack {
+            cartList
             orderInfo
             Spacer(minLength: 80)
         }
@@ -29,7 +26,7 @@ struct ShoppingCartDetail: View {
     }
     
     var cartList: some View {
-        ForEach(shoppingCart.cart) { item in
+        List(shoppingCart.cart) { item in
             HStack(spacing: 12) {
                 DataImage(data: item.product.imageData)
                     .frame(maxWidth: 100)
@@ -46,14 +43,23 @@ struct ShoppingCartDetail: View {
                         )
                         .fontWeight(.semibold)
                         .onAppear {
-                            subtotal += item.total
+                            shoppingCart.subtotal += item.total
                         }
                     }
                 }
-                Spacer()
             }
-            .padding()
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button(role: .destructive) {
+                    shoppingCart.removeFromCart(item)
+                    if(shoppingCart.cart.isEmpty) {
+                        dismiss()
+                    }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
         }
+        .listStyle(.plain)
     }
     
     var orderInfo: some View {
@@ -67,7 +73,7 @@ struct ShoppingCartDetail: View {
                 Label("Subtotal", systemImage: "dollarsign.circle")
                 Spacer()
                 Text(
-                    subtotal,
+                    shoppingCart.subtotal,
                     format: .currency(code: Locale.current.currency?.identifier ?? "USD")
                 )
             }
@@ -79,7 +85,10 @@ struct ShoppingCartDetail: View {
     var createOrderButton: some View {
         VStack {
             Spacer()
-            Button(action: { createOrder() }) {
+            Button{
+                shoppingCart.createOrder(subtotal: shoppingCart.subtotal, note: note)
+                dismiss()
+            } label: {
                 Text("Create order")
                     .frame(maxWidth: .infinity)
                     .padding(8)
@@ -88,41 +97,4 @@ struct ShoppingCartDetail: View {
             .padding()
         }
     }
-    
-    func createOrder() {
-        let userDefault = UserDefaults.standard
-        let orderNumber = userDefault.integer(forKey: "orderNumber")
-        if(orderNumber < 100) {
-            userDefault.setValue(orderNumber+1, forKey: "orderNumber")
-        } else {
-            userDefault.setValue(0, forKey: "orderNumber")
-        }
-        
-        let order = Order(
-            orderProducts: [],
-            createTime: Date(),
-            orderNumber: orderNumber,
-            subtotal: subtotal,
-            note: note,
-            finished: false
-        )
-        modelContext.insert(order)
-        
-        for index in shoppingCart.cart.indices {
-            let orderProduct = OrderProduct(
-                product: shoppingCart.cart[index].product,
-                order: order,
-                amount: shoppingCart.cart[index].amount
-            )
-            modelContext.insert(orderProduct)
-        }
-        
-        shoppingCart.clearCart()
-        dismiss()
-    }
-}
-
-#Preview {
-    ShoppingCartDetail()
-        .environmentObject(ShoppingCart())
 }

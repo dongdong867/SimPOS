@@ -5,11 +5,18 @@
 //  Created by Dong on 2024/2/6.
 //
 
+import SwiftData
 import SwiftUI
 
-class ShoppingCart: ObservableObject {
-    
+final class ShoppingCart: ObservableObject {
     @Published var cart = [ShoppingCartItem]()
+    @Published var subtotal: Float = 0
+    
+    var modelContext: ModelContext
+    
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
     
     struct ShoppingCartItem: Identifiable {
         var product: Product
@@ -26,11 +33,14 @@ class ShoppingCart: ObservableObject {
         return -1
     }
     
-    func addToCart(_ item: ShoppingCartItem) {
-        if(item.product.storage != nil) {
-            item.product.storage! -= item.amount
+    func getItemAmount(_ product: Product) -> Int {
+        if let index = cart.firstIndex(where: { $0.id == product }) {
+            return cart[index].amount
         }
-        
+        return 0
+    }
+    
+    func addToCart(_ item: ShoppingCartItem) {
         let index = getItemIndex(item)
         if(index == -1) {
             cart.append(item)
@@ -47,6 +57,42 @@ class ShoppingCart: ObservableObject {
     func removeFromCart(_ itemToRemove: ShoppingCartItem) {
         let index = getItemIndex(itemToRemove)
         cart.remove(at: index)
+        subtotal -= itemToRemove.total
+        
+    }
+    
+    func createOrder(subtotal: Float, note: String) {
+        let userDefault = UserDefaults.standard
+        let orderNumber = userDefault.integer(forKey: "orderNumber")
+        if(orderNumber < 100) {
+            userDefault.setValue(orderNumber+1, forKey: "orderNumber")
+        } else {
+            userDefault.setValue(0, forKey: "orderNumber")
+        }
+        
+        let order = Order(
+            createTime: Date(),
+            orderNumber: orderNumber,
+            subtotal: subtotal,
+            note: note,
+            finished: false
+        )
+        modelContext.insert(order)
+        
+        for index in cart.indices {
+            if(cart[index].product.storage != nil) {
+                cart[index].product.storage! -= cart[index].amount
+            }
+            
+            let orderProduct = OrderProduct(
+                product: cart[index].product,
+                order: order,
+                amount: cart[index].amount
+            )
+            modelContext.insert(orderProduct)
+        }
+        
+        clearCart()
     }
     
     func clearCart() {
