@@ -133,7 +133,7 @@ struct ProductDetailView: View {
                 .padding(.horizontal)
                 .background(.background)
                 .clipShape(Capsule())
-                
+
                 Button(action: { isDeleteAlertShow.toggle() }) {
                     Image(systemName: "trash")
                 }
@@ -148,7 +148,7 @@ struct ProductDetailView: View {
                     dismiss()
                     }
                 } message: {
-                    Text("Deleting product will remove all data contains product \(product.name).")
+                    Text("Deleting product will remove all data contains product \(product.name)")
                 }
             }
             
