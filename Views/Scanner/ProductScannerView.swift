@@ -122,5 +122,5 @@ struct ProductScannerView: View {
     }
     
     return ProductScannerView(modelContext: container.mainContext)
-        .environmentObject(ShoppingCart())
+        .environmentObject(ShoppingCart(modelContext: container.mainContext))
 }

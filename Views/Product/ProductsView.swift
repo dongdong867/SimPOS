@@ -172,5 +172,5 @@ struct ProductsView: View {
     
     return ProductsView(modelContext: container.mainContext)
         .modelContainer(for: [Product.self, Order.self, OrderProduct.self])
-        .environmentObject(ShoppingCart())
+        .environmentObject(ShoppingCart(modelContext: container.mainContext))
 }
