@@ -23,9 +23,9 @@ final class Order {
     var finished: Bool
     
     
-    init(orderProducts: [OrderProduct], createTime: Date, orderNumber: Int, subtotal: Float, note: String, finished: Bool) {
+    init(createTime: Date, orderNumber: Int, subtotal: Float, note: String, finished: Bool) {
         self.id = UUID().uuidString
-        self.orderProducts = orderProducts
+        self.orderProducts = []
         self.createTime = createTime
         self.orderNumber = orderNumber
         self.subtotal = subtotal
