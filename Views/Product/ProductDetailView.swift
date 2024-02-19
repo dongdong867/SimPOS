@@ -13,12 +13,13 @@ struct ProductDetailView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var shoppingCart: ShoppingCart
     
-    @State var amount: Int = 0
+    @State var amount: Int = 1
     @State var amountIsOverStorage: Bool = false
     @State var isDeleteAlertShow = false
     @State var productToEdit: Product?
     
     var product: Product
+    var inCartAmount: Int { shoppingCart.getItemAmount(product) }
     let delete: (Product) -> Void
     
     var body: some View {
@@ -65,7 +66,7 @@ struct ProductDetailView: View {
     var amountStepper: some View {
         VStack {
             if let storage = product.storage {
-                Text("Current storage: \(storage)")
+                Text("Current storage: \(storage - inCartAmount)")
             }
             
             HStack {
@@ -73,7 +74,7 @@ struct ProductDetailView: View {
                 Button(action: { amount -= 1 }) {
                     Image(systemName: "minus")
                 }
-                .disabled(amount == 0)
+                .disabled(amount == 1)
                 
                 TextField("", value: $amount, format: .number)
                     .keyboardType(.numberPad)
@@ -85,13 +86,15 @@ struct ProductDetailView: View {
                             .stroke(amountIsOverStorage ? .red : .gray)
                     }
                     .onChange(of: amount) { oldValue, newValue in
-                        amountIsOverStorage = amount > product.storage ?? amount+1
+                        if let storage = product.storage {
+                            amountIsOverStorage = amount > storage - inCartAmount
+                        }
                     }
                 
                 Button(action: { amount += 1 }) {
                     Image(systemName: "plus")
                 }
-                .disabled(amountIsOverStorage)
+                .disabled(amount >= product.storage ?? .max - inCartAmount)
                 Spacer()
             }
             .font(.title2)
