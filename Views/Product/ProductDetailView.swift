@@ -120,12 +120,14 @@ struct ProductDetailView: View {
     var navigationBar: some View {
         VStack {
             HStack{
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.backward")
+                if(UIDevice.current.systemName != "iPadOS"){
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "chevron.backward")
+                    }
+                    .padding(8)
+                    .background(.background)
+                    .clipShape(Circle())
                 }
-                .padding(8)
-                .background(.background)
-                .clipShape(Circle())
                 
                 Spacer()
                 
