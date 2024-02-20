@@ -23,34 +23,52 @@ struct SalesView: View {
                     ScrollView {
                     Group {
                         if(gr.size.width > gr.size.height) {
-                            VStack(spacing: 8) {
-                                picker
-                                pagination
-                                HStack {
-                                    VStack {
-                                        pieChart
-                                            .padding()
-                                        salesDetail
-                                    }
-                                    salesChart
-                                        .padding(.horizontal)
-                                }
-                            }
-                            .padding(.vertical)
+                            iPadOSLayout
                         } else {
-                            VStack(spacing: 12) {
-                                picker
-                                pagination
-                                pieChart
-                                salesDetail
-                                salesChart
-                            }
+                            defaultLayout
                         }
                     }
                     .padding(.horizontal)
                     .navigationTitle("Sales")
                 }
             }
+        }
+    }
+    
+    var iPadOSLayout: some View {
+        VStack(spacing: 8) {
+            picker
+            pagination
+            HStack {
+                VStack {
+                    pieChart
+                        .padding()
+                    salesDetail
+                }
+                SalesChart(
+                    startOfDate: sales.startOfDate,
+                    endOfDate: sales.endOfDate,
+                    orders: sales.orders,
+                    selectedDateRange: sales.selectedDateRange
+                )
+                .padding(.horizontal)
+            }
+        }
+        .padding(.vertical)
+    }
+    
+    var defaultLayout: some View {
+        VStack(spacing: 12) {
+            picker
+            pagination
+            pieChart
+            salesDetail
+            SalesChart(
+                startOfDate: sales.startOfDate,
+                endOfDate: sales.endOfDate,
+                orders: sales.orders,
+                selectedDateRange: sales.selectedDateRange
+            )
         }
     }
     
@@ -119,27 +137,6 @@ struct SalesView: View {
         .padding(.horizontal)
     }
     
-    var salesChart: some View {
-        VStack(alignment: .leading) {
-            Text("Sales chart")
-                .font(.caption)
-                .foregroundStyle(.gray.opacity(0.6))
-            
-            Chart {
-                BarMark(x: .value("Time", sales.startOfDate), y: .value("Sales", 0))
-                BarMark(x: .value("Time", sales.endOfDate), y: .value("Sales", 0))
-                
-                ForEach(sales.orders, id: \.createTime) {
-                    BarMark(
-                        x: .value("Time", $0.createTime ..< $0.createTime.advanced(by: sales.selectedDateRange.getTimeInterval())),
-                        y: .value("Sales", $0.subtotal)
-                    )
-                }
-            }
-            .chartXAxis { salesChartXAxis }
-        }
-    }
-    
     var dateRange: some View {
         HStack(spacing: 0) {
             switch sales.selectedDateRange {
@@ -170,40 +167,6 @@ struct SalesView: View {
         }
         .alert(isPresented: $isCostPopoverShow) {
             Alert(title: Text("Calculating details"), message: Text("Products with no cost given will be calculate as 0."))
-        }
-    }
-    
-    @AxisContentBuilder
-    var salesChartXAxis: some AxisContent {
-        switch sales.selectedDateRange {
-            case .day:
-                AxisMarks(values: .stride(by: .hour, count: 6)) { value in
-                    AxisValueLabel(format: .dateTime.hour())
-                    AxisGridLine()
-                    AxisTick()
-                }
-                
-            case .week:
-                AxisMarks(values: .stride(by: .day, count: 1)) { _ in
-                    AxisValueLabel(format: .dateTime.weekday(.narrow))
-                    AxisGridLine()
-                    AxisTick()
-                }
-                
-            case .month:
-                AxisMarks(values: .stride(by: .day, count: 7)) { value in
-                    if let date = value.as(Date.self) {
-                        let day = Calendar.current.component(.day, from: date)
-                        switch day {
-                            case 1:
-                                AxisValueLabel(format: .dateTime.month().day())
-                            default:
-                                AxisValueLabel(format: .dateTime.day())
-                        }
-                    }
-                    AxisGridLine()
-                    AxisTick()
-                }
         }
     }
 }
