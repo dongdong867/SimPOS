@@ -33,12 +33,12 @@ struct SalesView: View {
                                         salesDetail
                                     }
                                     salesChart
-                                        .padding()
+                                        .padding(.horizontal)
                                 }
                             }
                             .padding(.vertical)
                         } else {
-                            VStack {
+                            VStack(spacing: 12) {
                                 picker
                                 pagination
                                 pieChart
@@ -120,18 +120,24 @@ struct SalesView: View {
     }
     
     var salesChart: some View {
-        Chart {
-            BarMark(x: .value("Time", sales.startOfDate), y: .value("Sales", 0))
-            BarMark(x: .value("Time", sales.endOfDate), y: .value("Sales", 0))
+        VStack(alignment: .leading) {
+            Text("Sales chart")
+                .font(.caption)
+                .foregroundStyle(.gray.opacity(0.6))
             
-            ForEach(sales.orders, id: \.createTime) {
-                BarMark(
-                    x: .value("Time", $0.createTime ..< $0.createTime.advanced(by: sales.selectedDateRange.getTimeInterval())),
-                    y: .value("Sales", $0.subtotal)
-                )
+            Chart {
+                BarMark(x: .value("Time", sales.startOfDate), y: .value("Sales", 0))
+                BarMark(x: .value("Time", sales.endOfDate), y: .value("Sales", 0))
+                
+                ForEach(sales.orders, id: \.createTime) {
+                    BarMark(
+                        x: .value("Time", $0.createTime ..< $0.createTime.advanced(by: sales.selectedDateRange.getTimeInterval())),
+                        y: .value("Sales", $0.subtotal)
+                    )
+                }
             }
+            .chartXAxis { salesChartXAxis }
         }
-        .chartXAxis { salesChartXAxis }
     }
     
     var dateRange: some View {
