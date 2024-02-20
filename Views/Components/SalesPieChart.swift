@@ -31,7 +31,8 @@ struct SalesPieChart: View {
             VStack(alignment: .leading) {
                 Text("Total sales")
                     .font(.footnote)
-                Text(totalSales, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                
+                CurrencyText(value: totalSales)
                     .font(totalSales > 1_000_000 ? .title : .largeTitle)
                     .fontWeight(.bold)
             }

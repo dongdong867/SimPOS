@@ -5,7 +5,6 @@
 //  Created by Dong on 2024/2/17.
 //
 
-import Charts
 import SwiftData
 import SwiftUI
 
@@ -19,56 +18,19 @@ struct SalesView: View {
     
     var body: some View {
         NavigationStack {
-                GeometryReader { gr in
-                    ScrollView {
-                    Group {
-                        if(gr.size.width > gr.size.height) {
-                            iPadOSLayout
-                        } else {
-                            defaultLayout
-                        }
+            GeometryReader { gr in
+                ScrollView {
+                    picker
+                    pagination
+                    if(gr.size.width > gr.size.height) {
+                        iPadOSLayout
+                    } else {
+                        defaultLayout
                     }
-                    .padding(.horizontal)
-                    .navigationTitle("Sales")
                 }
-            }
-        }
-    }
-    
-    var iPadOSLayout: some View {
-        VStack(spacing: 8) {
-            picker
-            pagination
-            HStack {
-                VStack {
-                    pieChart
-                        .padding()
-                    salesDetail
-                }
-                SalesChart(
-                    startOfDate: sales.startOfDate,
-                    endOfDate: sales.endOfDate,
-                    orders: sales.orders,
-                    selectedDateRange: sales.selectedDateRange
-                )
                 .padding(.horizontal)
+                .navigationTitle("Sales")
             }
-        }
-        .padding(.vertical)
-    }
-    
-    var defaultLayout: some View {
-        VStack(spacing: 12) {
-            picker
-            pagination
-            pieChart
-            salesDetail
-            SalesChart(
-                startOfDate: sales.startOfDate,
-                endOfDate: sales.endOfDate,
-                orders: sales.orders,
-                selectedDateRange: sales.selectedDateRange
-            )
         }
     }
     
@@ -89,9 +51,7 @@ struct SalesView: View {
             Button(action: { sales.previous() }) {
                 Image(systemName: "chevron.left")
             }
-            
             dateRange
-            
             Button(action: { sales.next() }) {
                 Image(systemName: "chevron.right")
             }
@@ -99,6 +59,37 @@ struct SalesView: View {
         }
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.circle)
+    }
+    
+    var iPadOSLayout: some View {
+        VStack(spacing: 12) {
+            HStack {
+                VStack {
+                    pieChart
+                        .padding()
+                    salesDetail
+                }
+                SalesChart(
+                    startOfDate: sales.startOfDate,
+                    endOfDate: sales.endOfDate,
+                    orders: sales.orders,
+                    selectedDateRange: sales.selectedDateRange
+                )
+            }
+        }
+    }
+    
+    var defaultLayout: some View {
+        VStack(spacing: 12) {
+            pieChart
+            salesDetail
+            SalesChart(
+                startOfDate: sales.startOfDate,
+                endOfDate: sales.endOfDate,
+                orders: sales.orders,
+                selectedDateRange: sales.selectedDateRange
+            )
+        }
     }
     
     var pieChart: some View {
@@ -112,7 +103,7 @@ struct SalesView: View {
             VStack(alignment: .leading) {
                 Text("Income")
                     .font(.footnote)
-                Text(sales.income, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                CurrencyText(value: sales.income)
                     .font(.title2)
                     .fontWeight(.bold)
             }
@@ -128,7 +119,7 @@ struct SalesView: View {
                     costInfoButton
                 }
                 .font(.footnote)
-                Text(sales.cost, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                CurrencyText(value: sales.cost)
                     .font(.title2)
                     .fontWeight(.bold)
             }

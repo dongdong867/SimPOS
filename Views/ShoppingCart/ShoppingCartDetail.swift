@@ -5,7 +5,6 @@
 //  Created by Dong on 2024/2/6.
 //
 
-import SwiftData
 import SwiftUI
 
 struct ShoppingCartDetail: View {
@@ -15,14 +14,14 @@ struct ShoppingCartDetail: View {
     @State var note: String = ""
     
     var body: some View {
-        VStack {
-            cartList
-            orderInfo
-            Spacer(minLength: 80)
+        NavigationStack {
+            VStack {
+                cartList
+                orderInfo
+                Spacer(minLength: 80)
+            }
         }
-        .overlay {
-            createOrderButton
-        }
+        .overlay { createOrderButton }
     }
     
     var cartList: some View {
@@ -30,21 +29,18 @@ struct ShoppingCartDetail: View {
             HStack(spacing: 12) {
                 DataImage(data: item.product.imageData)
                     .frame(maxWidth: 100)
+                
                 VStack(alignment: .leading) {
                     Text(item.product.name)
                         .font(.title2)
                         .fontWeight(.semibold)
                     Text("Amount: \(item.amount)")
+                    
                     HStack {
                         Spacer()
-                        Text(
-                            item.total,
-                            format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-                        )
-                        .fontWeight(.semibold)
-                        .onAppear {
-                            shoppingCart.subtotal += item.total
-                        }
+                        CurrencyText(value: item.total)
+                            .fontWeight(.semibold)
+                            .onAppear { shoppingCart.subtotal += item.total }
                     }
                 }
             }
@@ -60,6 +56,7 @@ struct ShoppingCartDetail: View {
             }
         }
         .listStyle(.plain)
+        .navigationTitle("Shopping Cart")
     }
     
     var orderInfo: some View {
@@ -67,15 +64,14 @@ struct ShoppingCartDetail: View {
             Label("Notes", systemImage: "note.text")
             TextField("Add notes here.", text: $note)
                 .textFieldStyle(.roundedBorder)
+            
             Divider()
                 .padding(.vertical)
+            
             HStack {
                 Label("Subtotal", systemImage: "dollarsign.circle")
                 Spacer()
-                Text(
-                    shoppingCart.subtotal,
-                    format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-                )
+                CurrencyText(value: shoppingCart.subtotal)
             }
             .fontWeight(.bold)
         }

@@ -21,6 +21,7 @@ struct SalesChart: View {
                 .foregroundStyle(.gray.opacity(0.6))
             
             Chart {
+                // setting the boundary of chart
                 BarMark(x: .value("Time", startOfDate), y: .value("Sales", 0))
                 BarMark(x: .value("Time", endOfDate), y: .value("Sales", 0))
                 
@@ -41,15 +42,13 @@ struct SalesChart: View {
             case .day:
                 AxisMarks(values: .stride(by: .hour, count: 6)) { value in
                     AxisValueLabel(format: .dateTime.hour())
-                    AxisGridLine()
-                    AxisTick()
+                    axisLine
                 }
                 
             case .week:
                 AxisMarks(values: .stride(by: .day, count: 1)) { _ in
                     AxisValueLabel(format: .dateTime.weekday(.narrow))
-                    AxisGridLine()
-                    AxisTick()
+                    axisLine
                 }
                 
             case .month:
@@ -63,9 +62,14 @@ struct SalesChart: View {
                                 AxisValueLabel(format: .dateTime.day())
                         }
                     }
-                    AxisGridLine()
-                    AxisTick()
+                    axisLine
                 }
         }
+    }
+    
+    @AxisMarkBuilder
+    var axisLine: some AxisMark {
+        AxisGridLine()
+        AxisTick()
     }
 }

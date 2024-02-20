@@ -25,7 +25,7 @@ final class ProductList: ObservableObject {
                 $0.name.localizedStandardContains(query)
             }
         }, sortBy: [.init(\.name), .init(\.code)])
-
+        
         products = (try? modelContext.fetch(descriptor)) ?? []
     }
     

@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ProductDetailView: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var shoppingCart: ShoppingCart
     
     @State var amount: Int = 1
@@ -53,12 +52,9 @@ struct ProductDetailView: View {
                 .font(.title)
                 .fontWeight(.bold)
             
-            Text(
-                product.price,
-                format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-            )
-            .font(.title2)
-            .fontWeight(.medium)
+            CurrencyText(value: product.price)
+                .font(.title2)
+                .fontWeight(.medium)
         }
         .padding()
     }
@@ -69,42 +65,44 @@ struct ProductDetailView: View {
                 Text("Current storage: \(storage - inCartAmount)")
             }
             
-            HStack {
-                Spacer()
+            HStack(alignment: .center) {
                 Button(action: { amount -= 1 }) {
                     Image(systemName: "minus")
                 }
                 .disabled(amount == 1)
                 
-                TextField("", value: $amount, format: .number)
-                    .keyboardType(.numberPad)
-                    .frame(maxWidth: 60)
-                    .padding(4)
-                    .multilineTextAlignment(.center)
-                    .background {
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(amountIsOverStorage ? .red : .gray)
-                    }
-                    .onChange(of: amount) { oldValue, newValue in
-                        if let storage = product.storage {
-                            amountIsOverStorage = amount > storage - inCartAmount
-                        }
-                    }
+                amountTextField
                 
                 Button(action: { amount += 1 }) {
                     Image(systemName: "plus")
                 }
                 .disabled(amount >= product.storage ?? .max - inCartAmount)
-                Spacer()
             }
+            .frame(maxWidth: .infinity)
             .font(.title2)
             .fontWeight(.bold)
         }
     }
     
+    var amountTextField: some View {
+        TextField("", value: $amount, format: .number)
+            .keyboardType(.numberPad)
+            .frame(maxWidth: 60)
+            .multilineTextAlignment(.center)
+            .background {
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(amountIsOverStorage ? .red : .gray)
+            }
+            .onChange(of: amount) { oldValue, newValue in
+                if let storage = product.storage {
+                    amountIsOverStorage = amount > storage - inCartAmount
+                }
+            }
+    }
+    
     var addToCartButton: some View {
         Button(action: {
-            shoppingCart.addToCart(ShoppingCart.ShoppingCartItem(product: product, amount: amount))
+            shoppingCart.addToCart(ShoppingCartItem(product: product, amount: amount))
             dismiss()
         }) {
             Text("Add to shop cart.")
@@ -114,47 +112,30 @@ struct ProductDetailView: View {
         }
         .buttonStyle(.borderedProminent)
         .padding()
-        .disabled(amount == 0 || amountIsOverStorage)
+        .disabled(amount <= 0 || amountIsOverStorage)
     }
     
     var navigationBar: some View {
         VStack {
             HStack{
                 if(UIDevice.current.systemName != "iPadOS"){
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.backward")
-                    }
-                    .padding(8)
-                    .background(.background)
-                    .clipShape(Circle())
+                    navigationBarButton("chevron.backward", action: { dismiss() })
                 }
-                
                 Spacer()
                 
-                Button("Edit") {
-                    productToEdit = product
-                }
-                .padding(.vertical, 8)
-                .padding(.horizontal)
-                .background(.background)
-                .clipShape(Capsule())
-
-                Button(action: { isDeleteAlertShow.toggle() }) {
-                    Image(systemName: "trash")
-                }
-                .tint(.red)
-                .padding(8)
-                .background(.background)
-                .clipShape(Circle())
-                .alert("Delete \(product.name)", isPresented: $isDeleteAlertShow) {
-                    Button("Delete", role: .destructive) {
-                        let productToDelete = product
-                        delete(productToDelete)
-                    dismiss()
+                navigationBarButton("square.and.pencil", action: { productToEdit = product })
+                
+                navigationBarButton("trash", action: { isDeleteAlertShow.toggle() })
+                    .tint(.red)
+                    .confirmationDialog("Delete \(product.name)", isPresented: $isDeleteAlertShow) {
+                        Button("Delete", role: .destructive) {
+                            let productToDelete = product
+                            delete(productToDelete)
+                            dismiss()
+                        }
+                    } message: {
+                        Text("Are you sure to delete product: \(product.name)")
                     }
-                } message: {
-                    Text("Deleting product will remove all data contains product \(product.name)")
-                }
             }
             
             Spacer()
@@ -162,5 +143,14 @@ struct ProductDetailView: View {
         .foregroundStyle(.tint)
         .fontWeight(.medium)
         .padding()
+    }
+    
+    func navigationBarButton(_ systemName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+        }
+        .padding(8)
+        .background(.background)
+        .clipShape(Circle())
     }
 }

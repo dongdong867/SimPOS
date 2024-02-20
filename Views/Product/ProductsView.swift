@@ -16,90 +16,66 @@ struct ProductsView: View {
     @State var selectedProduct: Product? = nil
     @State var isCreateProductSheetShow = false
     @State var sidebarVisibility = NavigationSplitViewVisibility.doubleColumn
+    let isIPad = UIDevice.current.systemName == "iPadOS"
     
     init(modelContext: ModelContext) {
         products = ProductList(modelContext: modelContext)
     }
     
     var body: some View {
-        dynamicNavigationLayout
-            .searchable(text: $search)
-            .onChange(of: search) {
-                products.fetchProducts(with: search)
-            }
-            .onAppear {
-                products.fetchProducts(with: search)
-            }
-    }
-    
-    @ViewBuilder
-    var dynamicNavigationLayout: some View {
-        if(UIDevice.current.systemName == "iPadOS") {
-            NavigationSplitView(columnVisibility: $sidebarVisibility) {
-                if(products.products.isEmpty) { emptyStoragePlaceholder }
-                
-                sideBar
-                    .navigationTitle("Products")
-                    .scrollClipDisabled()
-                    .padding(.horizontal)
-                    .toolbar(removing: .sidebarToggle)
-                    .toolbar { toolbar }
-                    .overlay {
-                        if(!shoppingCart.cart.isEmpty) {
-                            VStack {
-                                Spacer()
-                                ShoppingCartButton()
-                            }
-                        }
-                    }
-            } detail: {
-                if(selectedProduct != nil) {
-                    ProductDetailView(product: selectedProduct!) { productToDelete in
-                        products.deleteProduct(productToDelete)
-                        products.fetchProducts(with: search)
-                        selectedProduct = nil
-                    }
+        Group {
+            if isIPad {
+                NavigationSplitView(columnVisibility: $sidebarVisibility) {
+                    productList
+                        .toolbar(removing: .sidebarToggle)
+                } detail: {
+                    spiltViewDetail
                         .navigationBarBackButtonHidden()
-                } else {
-                    Text("No selected product.")
                 }
-            }
-            .navigationSplitViewStyle(.balanced)
-        } else {
-            NavigationStack {
-                if(products.products.isEmpty) { emptyStoragePlaceholder }
-                
-                GeometryReader { gr in
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: cardSizeThatFits(for: gr.size)))], alignment: .leading) {
-                            ForEach(products.products) { product in
-                                NavigationLink {
-                                    ProductDetailView(product: product) { productToDelete in
-                                        products.deleteProduct(productToDelete)
-                                        products.fetchProducts(with: search)
-                                    }
-                                        .navigationBarBackButtonHidden()
-                                } label: {
-                                    productCard(product)
-                                }
-                            }
-                        }
-                    }
-                    .scrollClipDisabled()
-                }
-                .navigationTitle("Products")
-                .padding(.horizontal)
-                .toolbar { toolbar }
-                .overlay {
-                    if(!shoppingCart.cart.isEmpty) {
-                        VStack {
-                            Spacer()
-                            ShoppingCartButton()
-                        }
-                    }
+                .navigationSplitViewStyle(.balanced)
+            } else {
+                NavigationStack {
+                    productList
                 }
             }
         }
+        .searchable(text: $search)
+        .onAppear { products.fetchProducts(with: search) }
+        .onChange(of: search) {
+            products.fetchProducts(with: search)
+        }
+    }
+    
+    @ViewBuilder
+    var productList: some View {
+        if(products.products.isEmpty) { emptyStoragePlaceholder }
+        GeometryReader { gr in
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: cardSizeThatFits(for: gr.size)))], alignment: .leading) {
+                    ForEach(products.products) { product in
+                        if isIPad {
+                            productCard(product)
+                                .onTapGesture { selectedProduct = product }
+                        } else {
+                            defaultProductCard(product)
+                        }
+                    }
+                }
+            }
+            .scrollClipDisabled()
+        }
+        .navigationTitle("Products")
+        .padding(.horizontal)
+        .toolbar { toolbar }
+        .overlay { shoppingCartButton }
+    }
+    
+    var emptyStoragePlaceholder: some View {
+        ContentUnavailableView(
+            "No products found.",
+            systemImage: "tray.fill",
+            description: Text("Click plus button to create products.")
+        )
     }
     
     var toolbar: some ToolbarContent {
@@ -122,25 +98,38 @@ struct ProductsView: View {
         }
     }
     
-    var sideBar: some View {
-        GeometryReader { gr in
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: cardSizeThatFits(for: gr.size)))], alignment: .leading) {
-                    ForEach(products.products) { product in
-                        productCard(product)
-                            .onTapGesture { selectedProduct = product }
-                    }
-                }
+    var shoppingCartButton: some View {
+        VStack {
+            if(!shoppingCart.cart.isEmpty) {
+                Spacer()
+                ShoppingCartButton()
             }
         }
     }
     
-    var emptyStoragePlaceholder: some View {
-        ContentUnavailableView(
-            "No products found.",
-            systemImage: "tray.fill",
-            description: Text("Click plus button to create products.")
-        )
+    @ViewBuilder
+    var spiltViewDetail: some View {
+        if(selectedProduct != nil) {
+            ProductDetailView(product: selectedProduct!) { productToDelete in
+                products.deleteProduct(productToDelete)
+                products.fetchProducts(with: search)
+                selectedProduct = nil
+            }
+        } else {
+            Text("No selected product.")
+        }
+    }
+    
+    func defaultProductCard(_ product: Product) -> some View {
+        NavigationLink {
+            ProductDetailView(product: product) { productToDelete in
+                products.deleteProduct(productToDelete)
+                products.fetchProducts(with: search)
+            }
+            .navigationBarBackButtonHidden()
+        } label: {
+            productCard(product)
+        }
     }
     
     func productCard(_ product: Product) -> some View {
@@ -150,7 +139,6 @@ struct ProductsView: View {
         }
         .tint(.primary)
     }
-    
     
     func cardSizeThatFits(for size: CGSize) -> Double {
         if(size.width < size.height) {

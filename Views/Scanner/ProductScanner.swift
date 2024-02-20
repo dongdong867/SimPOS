@@ -1,6 +1,6 @@
 //
 //  ProductScanner.swift
-//  
+//
 //
 //  Created by Dong on 2024/2/12.
 //
@@ -27,7 +27,6 @@ final class ProductScanner: ObservableObject {
            count > 0 {
             return true
         }
-        
         return false
     }
     

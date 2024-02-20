@@ -74,15 +74,9 @@ struct OrdersView: View {
         VStack {
             ForEach(order.orderProducts) { item in
                 HStack {
-                    HStack {
-                        Text(item.product.name)
-                        Text("x\(item.amount)")
-                    }
+                    Text("\(item.product.name) x\(item.amount)")
                     Spacer()
-                    Text(
-                        item.product.price * Float(item.amount),
-                        format: .currency(code: Locale.current.currency?.identifier ?? "USD")
-                    )
+                    CurrencyText(value: item.product.price * Float(item.amount))
                 }
             }
             Divider()
@@ -105,7 +99,7 @@ struct OrdersView: View {
         HStack {
             Text("Subtotal")
             Spacer()
-            Text(order.subtotal, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+            CurrencyText(value: order.subtotal)
         }
         .font(.headline)
         

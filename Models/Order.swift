@@ -12,7 +12,7 @@ import SwiftData
 final class Order {
     @Attribute(.unique)
     let id: String
-
+    
     @Relationship(deleteRule: .cascade, inverse: \OrderProduct.order)
     var orderProducts: [OrderProduct] = []
     

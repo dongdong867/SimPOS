@@ -27,7 +27,6 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         checkAuthorizationStatus()
     }
     
@@ -37,7 +36,6 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
         }
     }
     
-    
     override func viewDidDisappear(_ animated: Bool) {
         DispatchQueue.main.async {
             self.captureSession.stopRunning()
@@ -46,20 +44,22 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     
     @objc
     func orientationChanged() {
-//        switch UIDevice.current.orientation {
-//            case UIDeviceOrientation.portraitUpsideDown:
-//                self.previewLayer.connection?.videoRotationAngle = 180
-//                
-//            case UIDeviceOrientation.landscapeLeft:
-//                self.previewLayer.connection?.videoRotationAngle = 90
-//                
-//            case UIDeviceOrientation.landscapeRight:
-//                self.previewLayer.connection?.videoRotationAngle = -90
-//            
-//            default:
-//                self.previewLayer.connection?.videoRotationAngle = 90
-//        }
+        //        FIXME: - Unknown bug when rotation angle is -90.
+        //        switch UIDevice.current.orientation {
+        //            case UIDeviceOrientation.portraitUpsideDown:
+        //                self.previewLayer.connection?.videoRotationAngle = 180
+        //                
+        //            case UIDeviceOrientation.landscapeLeft:
+        //                self.previewLayer.connection?.videoRotationAngle = 90
+        //                
+        //            case UIDeviceOrientation.landscapeRight:
+        //                self.previewLayer.connection?.videoRotationAngle = -90
+        //            
+        //            default:
+        //                self.previewLayer.connection?.videoRotationAngle = 90
+        //        }
         
+        // FIXME: - Deprecated in iOS17, waiting to replace by videoRotationAngle when bug fixed.
         switch UIDevice.current.orientation {
             case .portrait:
                 self.previewLayer.connection?.videoOrientation = .portrait
@@ -114,7 +114,7 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
             name: UIDevice.orientationDidChangeNotification,
             object: nil
         )
-                
+        
         let videoInput: AVCaptureDeviceInput
         do {
             videoInput = try AVCaptureDeviceInput(device: captureDevice)
@@ -122,7 +122,7 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
         } catch let error {
             completion(.failure(.customError(error)))
         }
-            
+        
         let metadataOutput = AVCaptureMetadataOutput()
         captureSession.addOutput(metadataOutput)
         metadataOutput.metadataObjectTypes = [.qr, .upce, .ean8, .ean13]

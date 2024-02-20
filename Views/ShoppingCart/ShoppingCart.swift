@@ -18,14 +18,6 @@ final class ShoppingCart: ObservableObject {
         self.modelContext = modelContext
     }
     
-    struct ShoppingCartItem: Identifiable {
-        var product: Product
-        var amount: Int
-        var total: Float { product.price * Float(amount) }
-        
-        var id: Product { product }
-    }
-    
     func getItemIndex(_ item: ShoppingCartItem) -> Int {
         if let index = cart.firstIndex(where: { $0.id == item.id }) {
             return index
@@ -50,15 +42,12 @@ final class ShoppingCart: ObservableObject {
     }
     
     func updateCart(_ item: ShoppingCartItem) {
-        let index = getItemIndex(item)
-        cart[index] = item
+        cart[getItemIndex(item)] = item
     }
     
     func removeFromCart(_ itemToRemove: ShoppingCartItem) {
-        let index = getItemIndex(itemToRemove)
-        cart.remove(at: index)
+        cart.remove(at: getItemIndex(itemToRemove))
         subtotal -= itemToRemove.total
-        
     }
     
     func createOrder(subtotal: Float, note: String) {
@@ -98,4 +87,12 @@ final class ShoppingCart: ObservableObject {
     func clearCart() {
         cart.removeAll()
     }
+}
+
+struct ShoppingCartItem: Identifiable {
+    var product: Product
+    var amount: Int
+    var total: Float { product.price * Float(amount) }
+    
+    var id: Product { product }
 }

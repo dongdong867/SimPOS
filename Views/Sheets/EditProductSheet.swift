@@ -39,22 +39,9 @@ struct EditProductSheet: View {
             .multilineTextAlignment(.trailing)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                if(title == "Create product") {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button {
-                            let nameValidation = validation.validateName(input: product.name)
-                            let priceValidation = validation.validatePrice(input: product.price)
-                            if(nameValidation && priceValidation) {
-                                if(save != nil) { save!(product) }
-                                dismiss()
-                            }
-                        } label: {
-                            Text("Save")
-                        }
-                    }
-                }
-            })
+            .toolbar {
+                if(title == "Create product") { toolbar }
+            }
         }
     }
     
@@ -71,60 +58,58 @@ struct EditProductSheet: View {
     }
     
     var barCodeScanner: some View {
-        @State var scannerError: ScannerController.ScannerError?
-        @State var errorActionIsShow = false
-        
-        return HStack {
-            Button(action: { isScannerShow.toggle() }, label: {Text("Scan a barcode")})
+        HStack {
+            Button(action: { isScannerShow.toggle() }, label: {Text("Scan barcode")})
             Spacer()
             Text(product.code ?? "")
         }
         .sheet(isPresented: $isScannerShow) {
             GeometryReader { gr in
                 VStack(alignment: .center, spacing: 12) {
-                    Spacer()
-                    
                     RoundedRectangle(cornerRadius: 12)
                         .frame(
                             width: min(min(gr.size.width, gr.size.height), 500),
                             height: min(min(gr.size.width, gr.size.height), 500)
                         )
-                        .overlay {
-                            Scanner { result in
-                                switch result {
-                                    case .success(let success):
-                                        product.code = success
-                                        isScannerShow = false
-                                    case .failure(let failure):
-                                        scannerError = failure
-                                        errorActionIsShow.toggle()
-                                }
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
+                        .overlay { scanner }
                     
                     HStack {
                         Text(product.code ?? "")
                         Spacer()
                         Button(action: { product.code = nil }) {
                             Image(systemName: "trash")
-                                .foregroundStyle(.red)
                         }
+                        .tint(.red)
                     }
                     .padding(.horizontal)
                     .frame(width: min(min(gr.size.width, gr.size.height), 500))
-                    
-                    Spacer()
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
             .presentationDragIndicator(.visible)
             .presentationDetents([.medium])
             .padding()
-            .alert(scannerError?.description() ?? "", isPresented: $errorActionIsShow) {
-                Button(action: {errorActionIsShow.toggle()}) {
-                    Text("OK")
-                }
+        }
+    }
+    
+    var scanner: some View {
+        @State var scannerError: ScannerController.ScannerError?
+        @State var errorActionIsShow = false
+        
+        return Scanner { result in
+            switch result {
+                case .success(let success):
+                    product.code = success
+                    isScannerShow = false
+                case .failure(let failure):
+                    scannerError = failure
+                    errorActionIsShow.toggle()
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .alert(scannerError?.description() ?? "", isPresented: $errorActionIsShow) {
+            Button(action: {errorActionIsShow.toggle()}) {
+                Text("OK")
             }
         }
     }
@@ -132,20 +117,29 @@ struct EditProductSheet: View {
     var imageSelector: some View {
         VStack(alignment: .leading) {
             PhotosPicker("Select a photo", selection: $selectedImage)
-                .onChange(of: selectedImage) { _, image in
-                    Task {
-                        if let data = try? await image?.loadTransferable(type: Data.self) {
-                            selectedImageData = data
-                            product.imageData = data
-                        }
-                    }
+            if selectedImageData != nil {
+                DataImage(data: selectedImageData)
+            }
+        }
+        .onChange(of: selectedImage) { _, image in
+            Task {
+                if let data = try? await image?.loadTransferable(type: Data.self) {
+                    selectedImageData = data
+                    product.imageData = data
                 }
-            if let imageData = selectedImageData,
-               let image = UIImage(data: imageData) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
+        }
+    }
+    
+    var toolbar: some ToolbarContent {
+        ToolbarItem(placement: .confirmationAction) {
+            Button("Save") {
+                let nameValidation = validation.validateName(input: product.name)
+                let priceValidation = validation.validatePrice(input: product.price)
+                if(nameValidation && priceValidation) {
+                    if(save != nil) { save!(product) }
+                    dismiss()
+                }
             }
         }
     }
@@ -157,6 +151,7 @@ struct EditProductSheet: View {
             HStack {
                 Text("Name")
                 TextField("Required", text: $product.name)
+                    .frame(maxWidth: .infinity)
             }
             
             if(validation.hasNameError) {
@@ -166,11 +161,12 @@ struct EditProductSheet: View {
     }
     
     var priceField: some View {
-        VStack {
+        VStack(alignment: .trailing) {
             HStack {
                 Text("Price")
                 TextField("Required", value: $product.price, formatter: numberFormatter)
                     .keyboardType(.decimalPad)
+                    .frame(maxWidth: .infinity)
             }
             
             if(validation.hasPriceError) {
@@ -184,6 +180,7 @@ struct EditProductSheet: View {
             Text("Cost")
             TextField("", value: $product.cost, format: .number)
                 .keyboardType(.decimalPad)
+                .frame(maxWidth: .infinity)
         }
     }
     
@@ -192,15 +189,14 @@ struct EditProductSheet: View {
             Text("Storage")
             TextField("", value: $product.storage, format: .number)
                 .keyboardType(.numberPad)
+                .frame(maxWidth: .infinity)
         }
     }
     
     func errorLabel(_ description: String) -> some View {
-        HStack {
-            Image(systemName: "info.circle")
-            Text(description)
-        }
-        .foregroundStyle(.red)
+        Label(description, systemImage: "info.circle")
+            .labelStyle(.titleAndIcon)
+            .foregroundStyle(.red)
     }
     
 }

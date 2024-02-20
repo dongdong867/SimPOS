@@ -17,19 +17,11 @@ struct ShoppingCartButton: View {
                 buttonLabel
             }
             .sheet(isPresented: $isSheetShow) {
-                VStack(alignment: .leading) {
-                    Text("Shopping Cart")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding()
-                        .padding(.top, 40)
-                    ShoppingCartDetail()
-                }
+                ShoppingCartDetail()
             }
         } else {
             NavigationLink {
                 ShoppingCartDetail()
-                    .navigationTitle("Shopping Cart")
             } label: {
                 buttonLabel
             }

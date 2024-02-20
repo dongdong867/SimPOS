@@ -23,7 +23,7 @@ struct DataImage: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         } else {
             RoundedRectangle(cornerRadius: 8)
-                .fill(.gray)
+                .fill(.gray.opacity(0.5))
                 .scaledToFit()
                 .overlay {
                     Image(systemName: "photo.fill")

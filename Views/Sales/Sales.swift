@@ -25,7 +25,7 @@ final class Sales: ObservableObject {
             startOfDate <= $0.createTime && $0.createTime < endOfDate
         })
     }
-
+    
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
