@@ -19,15 +19,38 @@ struct SalesView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                picker
-                pagination
-                pieChart
-                salesDetail
-                salesChart
+                GeometryReader { gr in
+                    ScrollView {
+                    Group {
+                        if(gr.size.width > gr.size.height) {
+                            VStack(spacing: 8) {
+                                picker
+                                pagination
+                                HStack {
+                                    VStack {
+                                        pieChart
+                                            .padding()
+                                        salesDetail
+                                    }
+                                    salesChart
+                                        .padding()
+                                }
+                            }
+                            .padding(.vertical)
+                        } else {
+                            VStack {
+                                picker
+                                pagination
+                                pieChart
+                                salesDetail
+                                salesChart
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .navigationTitle("Sales")
+                }
             }
-            .padding(.horizontal)
-            .navigationTitle("Sales")
         }
     }
     
