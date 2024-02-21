@@ -40,7 +40,6 @@ struct ShoppingCartDetail: View {
                         Spacer()
                         CurrencyText(value: item.total)
                             .fontWeight(.semibold)
-                            .onAppear { shoppingCart.subtotal += item.total }
                     }
                 }
             }

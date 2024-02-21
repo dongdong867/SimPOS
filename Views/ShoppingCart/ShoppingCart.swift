@@ -34,15 +34,12 @@ final class ShoppingCart: ObservableObject {
     
     func addToCart(_ item: ShoppingCartItem) {
         let index = getItemIndex(item)
+        subtotal += Float(item.amount) * item.product.price
         if(index == -1) {
             cart.append(item)
         } else {
             cart[index].amount += item.amount
         }
-    }
-    
-    func updateCart(_ item: ShoppingCartItem) {
-        cart[getItemIndex(item)] = item
     }
     
     func removeFromCart(_ itemToRemove: ShoppingCartItem) {
@@ -86,6 +83,7 @@ final class ShoppingCart: ObservableObject {
     
     func clearCart() {
         cart.removeAll()
+        subtotal = 0
     }
 }
 
