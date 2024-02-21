@@ -37,6 +37,9 @@ struct ProductDetailView: View {
         }
         .ignoresSafeArea(edges: .top)
         .overlay { navigationBar }
+        .onChange(of: product) {
+            amount = 1
+        }
         .sheet(item: $productToEdit) { editingProduct in
             EditProductSheet(
                 product: editingProduct,
