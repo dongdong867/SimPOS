@@ -26,10 +26,19 @@ struct SalesChart: View {
                 BarMark(x: .value("Time", endOfDate), y: .value("Sales", 0))
                 
                 ForEach(orders, id: \.createTime) {
-                    BarMark(
-                        x: .value("Time", $0.createTime ..< $0.createTime.advanced(by: selectedDateRange.getTimeInterval())),
-                        y: .value("Sales", $0.subtotal)
-                    )
+                    switch selectedDateRange {
+                        case .day:
+                            BarMark(
+                                x: .value("Time", $0.createTime ..< $0.createTime.advanced(by: 3_600)),
+                                y: .value("Sales", $0.subtotal)
+                            )
+                        default:
+                            BarMark(
+                                x: .value("Time", $0.createTime, unit: .day),
+                                y: .value("Sales", $0.subtotal)
+                            )
+                    }
+                    
                 }
             }
             .chartXAxis { salesChartXAxis }

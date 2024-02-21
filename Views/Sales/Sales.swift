@@ -113,15 +113,4 @@ final class Sales: ObservableObject {
 
 enum DateRangeOption: String, CaseIterable {
     case day, week, month
-    
-    func getTimeInterval() -> Double {
-        switch self {
-            case .day:
-                3_600
-            case .week:
-                21_600
-            case .month:
-                86_400
-        }
-    }
 }
