@@ -11,7 +11,7 @@ extension Date {
     func getStartOfDay() -> Date {
         return Calendar.current.startOfDay(for: self)
     }
-    
+        
     func getStartOfWeek() -> Date? {
         let calendar = Calendar.current
         guard let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
@@ -34,6 +34,12 @@ extension Date {
         components.day? -= 1
         
         return calendar.date(from: components)
+    }
+    
+    func getHour() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "hh"
+        return formatter.string(from: self)
     }
     
     func getMonth() -> String {
