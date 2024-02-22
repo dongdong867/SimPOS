@@ -28,7 +28,6 @@ struct ProductScannerView: View {
                 result
             }
             .padding()
-            .scaledToFill()
             .navigationTitle("Scanner")
             .onChange(of: scanResult) { scanResultChanged() }
             .sheet(isPresented: $productSheetIsShow, onDismiss: { scanResult = "" }) {
