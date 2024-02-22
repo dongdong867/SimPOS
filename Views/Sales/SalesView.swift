@@ -72,7 +72,7 @@ struct SalesView: View {
                 SalesChart(
                     startOfDate: sales.startOfDate,
                     endOfDate: sales.endOfDate,
-                    orders: sales.orders,
+                    salesData: sales.salesData,
                     selectedDateRange: sales.selectedDateRange
                 )
             }
@@ -86,7 +86,7 @@ struct SalesView: View {
             SalesChart(
                 startOfDate: sales.startOfDate,
                 endOfDate: sales.endOfDate,
-                orders: sales.orders,
+                salesData: sales.salesData,
                 selectedDateRange: sales.selectedDateRange
             )
         }
