@@ -25,7 +25,7 @@ struct ProductScannerView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 16) {
                 scannerPreview
-                if !scanResult.isEmpty { result }
+                result
                 Spacer()
             }
             .padding()
