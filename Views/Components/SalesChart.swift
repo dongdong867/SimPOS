@@ -11,7 +11,7 @@ import SwiftUI
 struct SalesChart: View {
     let startOfDate: Date
     let endOfDate: Date
-    let orders: [Order]
+    let salesData: [SalesData]
     let selectedDateRange: DateRangeOption
     
     var body: some View {
@@ -25,20 +25,11 @@ struct SalesChart: View {
                 BarMark(x: .value("Time", startOfDate), y: .value("Sales", 0))
                 BarMark(x: .value("Time", endOfDate), y: .value("Sales", 0))
                 
-                ForEach(orders, id: \.createTime) {
-                    switch selectedDateRange {
-                        case .day:
-                            BarMark(
-                                x: .value("Time", $0.createTime ..< $0.createTime.advanced(by: 3_600)),
-                                y: .value("Sales", $0.subtotal)
-                            )
-                        default:
-                            BarMark(
-                                x: .value("Time", $0.createTime, unit: .day),
-                                y: .value("Sales", $0.subtotal)
-                            )
-                    }
-                    
+                ForEach(salesData, id: \.time) { bar in
+                    BarMark(
+                        x: .value("Time", bar.time, unit: selectedDateRange == .day ? .hour : .day ),
+                        y: .value("Sales", bar.sales)
+                    )
                 }
             }
             .chartXAxis { salesChartXAxis }
