@@ -26,11 +26,9 @@ struct ProductScannerView: View {
             VStack(alignment: .leading, spacing: 16) {
                 scannerPreview
                 result
-                Spacer()
             }
             .padding()
-            .scaledToFit()
-            .frame(maxWidth: 500, maxHeight: 500)
+            .scaledToFill()
             .navigationTitle("Scanner")
             .onChange(of: scanResult) { scanResultChanged() }
             .sheet(isPresented: $productSheetIsShow, onDismiss: { scanResult = "" }) {
@@ -76,10 +74,12 @@ struct ProductScannerView: View {
                                 scanner.error = .internalError(failure)
                         }
                     }
+                    .background(.background)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
         }
         .scaledToFit()
+        .frame(maxWidth: 500, maxHeight: 500)
     }
     
     var result: some View {
@@ -92,6 +92,7 @@ struct ProductScannerView: View {
             .tint(.red)
         }
         .padding(.horizontal)
+        .frame(maxWidth: 500)
     }
     
     

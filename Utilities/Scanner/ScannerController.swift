@@ -32,6 +32,7 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     
     override func viewDidAppear(_ animated: Bool) {
         DispatchQueue.main.async {
+            self.setPreviewLayer()
             self.startSession()
         }
     }
@@ -132,6 +133,7 @@ class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
     func setPreviewLayer() {
         previewLayer.frame = CGRect(x: 0, y: 0, width: getPreviewFrameSize(), height: getPreviewFrameSize())
         previewLayer.videoGravity = .resizeAspectFill
+        orientationChanged()
         view.layer.addSublayer(previewLayer)
     }
     
