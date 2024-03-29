@@ -1,7 +1,5 @@
 <h1 align="center">SimPOS</h1>
 
----
-
 <h3 align="center">Sometimes Simple is all people needs.</h3>
 
 ![banner](Images/banner.png)
