@@ -20,7 +20,7 @@ SimPOS is a user-friendly point-of-sale system designed to streamline order and 
 
 ## Features
 
-- [ ] Point-of-sale system
-- [ ] Barcode scanner
-- [ ] Order status/ detail tracking
-- [ ] (Daily | Weekly | Monthly) sales analysis with chart
+- [x] Point-of-sale system
+- [x] Barcode scanner
+- [x] Order status/ detail tracking
+- [x] (Daily | Weekly | Monthly) sales analysis with chart
